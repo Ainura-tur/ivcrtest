@@ -1,9 +1,3 @@
-# Namespace protection (avoid MASS/stats masking dplyr verbs)
-select    <- dplyr::select;      filter    <- dplyr::filter
-mutate    <- dplyr::mutate;      slice     <- dplyr::slice
-recode    <- dplyr::recode;      rename    <- dplyr::rename
-summarise <- dplyr::summarise;   summarize <- dplyr::summarize
-arrange   <- dplyr::arrange;     count     <- dplyr::count;   lag <- dplyr::lag
 
 #' Computes the CIs and probabilities
 #' @param r_xu Numeric scalar, value of correlation coefficient rho_xu.

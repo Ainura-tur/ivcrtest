@@ -1,9 +1,3 @@
-# Namespace protection (avoid MASS/stats masking dplyr verbs)
-select    <- dplyr::select;      filter    <- dplyr::filter
-mutate    <- dplyr::mutate;      slice     <- dplyr::slice
-recode    <- dplyr::recode;      rename    <- dplyr::rename
-summarise <- dplyr::summarise;   summarize <- dplyr::summarize
-arrange   <- dplyr::arrange;     count     <- dplyr::count;   lag <- dplyr::lag
 
 #' # Return final projection indicator
 #' @param delta, d row or column vectors/matrices.

@@ -1,9 +1,3 @@
-# Namespace protection (avoid MASS/stats masking dplyr verbs)
-select    <- dplyr::select;      filter    <- dplyr::filter
-mutate    <- dplyr::mutate;      slice     <- dplyr::slice
-recode    <- dplyr::recode;      rename    <- dplyr::rename
-summarise <- dplyr::summarise;   summarize <- dplyr::summarize
-arrange   <- dplyr::arrange;     count     <- dplyr::count;   lag <- dplyr::lag
 
 #' Return value of gradient of g function
 #' @param r r_xu values
