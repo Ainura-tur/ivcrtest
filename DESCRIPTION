@@ -4,7 +4,7 @@ Title: Correlation-Restriction Test for Instrument Validity
 Version: 0.2.0
 Authors@R: c(
     person("Ratbek", "Dzhumashev", email= "ratbek.dzhumashev@monash.edu", role = c("aut", "cre")),
-    person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@data61.csiro.au", role = "aut"))
+    person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@csiro.au", role = "aut"))
 Description: Tests whether the orthogonality restriction on an instrument remains
     compatible with the data once the sign and magnitude of endogeneity are
     restricted. Inference uses the modified conditional union-bound interval of
