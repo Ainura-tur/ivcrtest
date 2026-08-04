@@ -1,0 +1,30 @@
+Package: ivcrtest
+Type: Package
+Title: Correlation-Restriction Test for Instrument Validity
+Version: 0.2.0
+Authors@R: c(
+    person("Ratbek", "Dzhumashev", email= "ratbek.dzhumashev@monash.edu", role = c("aut", "cre")),
+    person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@data61.csiro.au", role = "aut"))
+Description: Tests whether the orthogonality restriction on an instrument remains
+    compatible with the data once the sign and magnitude of endogeneity are
+    restricted. Inference uses the modified conditional union-bound interval of
+    Bei (2024), computed through the exact two-dimensional linear
+    reparameterisation of the finite-grid map, with Imbens-Manski/Stoye and
+    naive selected-endpoint intervals reported as diagnostics.
+URL: https://github.com/Ainura-tur/ivcrtest
+BugReports: https://github.com/Ainura-tur/ivcrtest/issues
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Imports:
+    stats,
+    MASS,
+    Matrix,
+    dplyr
+Suggests:
+    testthat (>= 3.0.0),
+    wooldridge,
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+RoxygenNote: 7.3.3
