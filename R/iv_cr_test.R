@@ -43,6 +43,12 @@ arrange   <- dplyr::arrange;     count     <- dplyr::count;   lag <- dplyr::lag
 #'   \code{"primitive"}.
 #' @param B_boot Integer bootstrap replications for the covariance of rho_hat.
 #' @param compute_pvalue Logical; whether to invert over the admissible range.
+#' @param common_sample Logical. When FALSE, the default, each instrument is
+#'   evaluated on its own complete-case sample, so a missing value in one
+#'   candidate instrument does not shrink the sample used for the others. This
+#'   is what the published applications do. Set TRUE to force the intersection
+#'   sample across all instruments in \code{Z}, which makes the columns
+#'   directly comparable but discards observations.
 #' @param verbose Logical; print progress.
 #' @param ... Further arguments passed to \code{\link{check_compatibility}}.
 #' @return An object of class \code{"iv_cr_test"}: a list with \code{results}
@@ -73,6 +79,7 @@ iv_cr_test <- function(data, X, Y, H, Z,
                        route          = c("reparam", "primitive"),
                        B_boot         = 800L,
                        compute_pvalue = TRUE,
+                       common_sample  = FALSE,
                        verbose        = TRUE,
                        ...) {
 
@@ -106,23 +113,37 @@ iv_cr_test <- function(data, X, Y, H, Z,
   set.seed(seed)
 
   # ---- residualisation on H only, per Appendix A.1 ----
-  dat <- data[complete.cases(data[, vars_needed, drop = FALSE]), vars_needed, drop = FALSE]
-  n   <- nrow(dat)
-  if (n < 30L) stop("iv_cr_test: fewer than 30 complete observations.")
-
   rhs <- if (length(H) > 0L) paste(H, collapse = " + ") else "1"
-  resid_on_H <- function(v) {
+  resid_on_H <- function(v, dat) {
     resid(lm(as.formula(paste0("`", v, "` ~ ", rhs)), data = dat))
   }
 
-  x <- resid_on_H(X)
-  y <- resid_on_H(Y)
+  # Sample selection. By default each instrument keeps its own complete cases;
+  # pooling them would let a missing value in one candidate shrink the sample
+  # used for every other, which is not what the applications do.
+  common_rows <- if (isTRUE(common_sample)) {
+    complete.cases(data[, vars_needed, drop = FALSE])
+  } else NULL
 
   results <- list()
   diags   <- list()
+  n_by_Z  <- integer(0)
 
   for (j in seq_along(Z)) {
-    zj <- resid_on_H(Z[j])
+    vj  <- unique(c(Y, X, H, Z[j]))
+    sel <- if (is.null(common_rows)) complete.cases(data[, vj, drop = FALSE]) else common_rows
+    dat <- data[sel, vj, drop = FALSE]
+    n   <- nrow(dat)
+    if (n < 30L) {
+      warning("iv_cr_test: fewer than 30 complete observations for ", Z[j],
+              "; skipping.", call. = FALSE)
+      next
+    }
+    n_by_Z[Z[j]] <- n
+
+    x  <- resid_on_H(X, dat)
+    y  <- resid_on_H(Y, dat)
+    zj <- resid_on_H(Z[j], dat)
 
     # Lemma 2.3 normalisation: work with the orientation giving rho_xz > 0.
     flipped <- FALSE
@@ -152,14 +173,17 @@ iv_cr_test <- function(data, X, Y, H, Z,
     results[[j]] <- res
   }
 
+  if (!length(results)) stop("iv_cr_test: no instrument had enough complete observations.")
+
   out <- list(results     = do.call(rbind, results),
               diagnostics = diags,
+              n_by_Z      = n_by_Z,
               domain      = rxu_range,
               k           = k,
               alpha       = alpha,
               K           = K,
               route       = route,
-              n           = n,
+              n           = if (length(unique(n_by_Z)) == 1L) unname(n_by_Z[1]) else n_by_Z,
               call        = cl)
   class(out) <- "iv_cr_test"
   out
@@ -173,9 +197,10 @@ iv_cr_test <- function(data, X, Y, H, Z,
 #' @export
 print.iv_cr_test <- function(x, ...) {
   cat("Instrumental Variable Correlation Restriction test\n")
-  cat(sprintf("  n = %d, D = [%.2f, %.2f], K = %d, alpha = %.3f, route = %s\n\n",
-              x$n, x$domain[1], x$domain[2], x$K, x$alpha, x$route))
-  cols <- c("Z", "plug_in", "CI_MCUB", "CI_IM", "CI_naive",
+  nlab <- if (length(x$n) == 1L) format(x$n) else "varies by instrument, see n"
+  cat(sprintf("  n = %s, D = [%.2f, %.2f], K = %d, alpha = %.3f, route = %s\n\n",
+              nlab, x$domain[1], x$domain[2], x$K, x$alpha, x$route))
+  cols <- c("Z", "n", "plug_in", "CI_MCUB", "CI_IM", "CI_naive",
             "Zero_in_CI_MCUB", "Zero_in_CI_IM", "p_adm_label", "G_hat", "status")
   cols <- intersect(cols, names(x$results))
   print(x$results[, cols, drop = FALSE], row.names = FALSE)

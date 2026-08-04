@@ -362,6 +362,25 @@ cr_switch_point <- function(df,
   }
 
   lo <- bracket[1]; hi <- bracket[2]
+
+  # Validate the bracket. Bisection silently converges to an endpoint if the
+  # two sides do not straddle the switch, which would return the bracket floor
+  # dressed up as a switching point.
+  a_lo <- isTRUE(accepts(lo)); a_hi <- isTRUE(accepts(hi))
+  want <- if (direction == "below") c(TRUE, FALSE) else c(FALSE, TRUE)
+  if (identical(c(a_lo, a_hi), c(TRUE, TRUE))) {
+    return(list(tau = NA_real_, direction = direction, bracket = sgn * sort(bracket),
+                n_fits = n_fits, status = "accepts throughout"))
+  }
+  if (identical(c(a_lo, a_hi), c(FALSE, FALSE))) {
+    return(list(tau = NA_real_, direction = direction, bracket = sgn * sort(bracket),
+                n_fits = n_fits, status = "rejects throughout"))
+  }
+  if (!identical(c(a_lo, a_hi), want)) {
+    stop("cr_switch_point: acceptance runs the wrong way across the bracket; ",
+         "check `direction`.")
+  }
+
   for (i in seq_len(steps)) {
     m <- (lo + hi) / 2
     a <- isTRUE(accepts(m))

@@ -15,7 +15,6 @@ URL: https://github.com/Ainura-tur/ivcrtest
 BugReports: https://github.com/Ainura-tur/ivcrtest/issues
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Imports:
     stats,
     MASS,
@@ -27,4 +26,4 @@ Suggests:
     knitr,
     rmarkdown
 Config/testthat/edition: 3
-RoxygenNote: 7.3.3
+Config/roxygen2/version: 8.0.0

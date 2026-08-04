@@ -2,7 +2,7 @@
 % Please edit documentation in R/iv_cr_test.R
 \name{iv_cr_test}
 \alias{iv_cr_test}
-\title{Perform Instrumental Variable Correlation Restirction test}
+\title{Perform the Instrumental Variable Correlation Restriction test}
 \usage{
 iv_cr_test(
   data,
@@ -11,55 +11,98 @@ iv_cr_test(
   H,
   Z,
   n = NULL,
-  k = -1,
+  k = 1,
   alpha = 0.05,
-  seed = 123,
-  rxu_range = c(0, 0.8),
-  bias_mc = FALSE,
-  mc_B = 500
+  seed = 123L,
+  rxu_range = NULL,
+  K = 80L,
+  route = c("reparam", "primitive"),
+  B_boot = 800L,
+  compute_pvalue = TRUE,
+  common_sample = FALSE,
+  verbose = TRUE,
+  ...
 )
 }
 \arguments{
-\item{data}{A data frame.}
+\item{data}{A data frame containing all variables.}
 
-\item{X}{Name of the endogenous variable.}
+\item{X}{Character. Name of the endogenous regressor.}
 
-\item{Y}{Name of the dependent variable.}
+\item{Y}{Character. Name of the dependent variable.}
 
-\item{H}{Vector of exogenous variable names.}
+\item{H}{Character vector of exogenous control names; may be NULL or empty,
+in which case the variables are only demeaned.}
 
-\item{Z}{Name of the instrumental variable.}
+\item{Z}{Character vector of one or more candidate instrument names. Each is
+tested separately.}
 
-\item{n}{Numeric scalar for size of the variables.}
+\item{n}{Ignored; determined internally from \code{data}.}
 
-\item{k}{Numeric scalar for direction of endogenity.}
+\item{k}{Sign of the maintained endogeneity restriction: \code{+1} when
+corr(x, u) is believed positive, \code{-1} when negative. Note that the
+default changed to \code{+1}, since the previous default of \code{-1} was
+inconsistent with the default positive \code{rxu_range}.}
 
-\item{alpha}{Numeric scalar for the level of H0 test.}
+\item{alpha}{Numeric significance level. Forwarded, not ignored.}
 
-\item{seed}{Numeric scalar  for reproducibility.}
+\item{seed}{Integer seed. Forwarded, not ignored.}
 
-\item{rxu_range}{Numeric interval for r_xu values.}
+\item{rxu_range}{Numeric vector of length 2 giving D. When NULL it defaults to
+\code{c(0, 0.8)} if \code{k > 0} and \code{c(-0.8, 0)} if \code{k < 0}.}
 
-\item{bias_mc}{Logical value.}
+\item{K}{Integer number of equally spaced grid points. Default 80.}
 
-\item{mc_B}{Numeric scalar for MC correction simulations.}
+\item{route}{Either \code{"reparam"} (default, Remark A.1) or
+\code{"primitive"}.}
+
+\item{B_boot}{Integer bootstrap replications for the covariance of rho_hat.}
+
+\item{compute_pvalue}{Logical; whether to invert over the admissible range.}
+
+\item{common_sample}{Logical. When FALSE, the default, each instrument is
+evaluated on its own complete-case sample, so a missing value in one
+candidate instrument does not shrink the sample used for the others. This
+is what the published applications do. Set TRUE to force the intersection
+sample across all instruments in \code{Z}, which makes the columns
+directly comparable but discards observations.}
+
+\item{verbose}{Logical; print progress.}
+
+\item{...}{Further arguments passed to \code{\link{check_compatibility}}.}
 }
 \value{
-A list containing CIs and coverage or containment probabilities.
+An object of class \code{"iv_cr_test"}: a list with \code{results}
+  (a data frame, one row per instrument), \code{diagnostics}, \code{domain},
+  \code{route} and the call.
 }
 \description{
-Perform Instrumental Variable Correlation Restirction test
+Tests whether the orthogonality value \eqn{\rho_{zu} = 0} lies in a
+parameter-coverage confidence interval for the scalar partially identified
+parameter \eqn{\theta_0 = \rho_{zu}}, given a researcher-specified admissible
+domain D for the unobserved endogeneity correlation \eqn{\rho_{xu}}.
+}
+\details{
+Exogenous controls are removed by residualisation only, as in Appendix A.1:
+\eqn{\tilde y = M_H y}, \eqn{\tilde x = M_H x} and \eqn{\tilde z = M_H z} with
+\eqn{M_H = I - H(H'H)^{-1}H'}. No further transformation is applied to the
+instrument.
+
+If the residualised instrument has \eqn{\hat\rho_{xz} < 0} it is replaced by
+its negative, which is without loss of generality under Lemma 2.3 since
+\eqn{E[z'u] = 0} if and only if \eqn{E[(-z)'u] = 0}. This negates the
+identified set and leaves the zero-inclusion decision unchanged.
 }
 \examples{
-df <- wooldridge::card  # Use sample data set
-data <- df[complete.cases(df), ]  # Remove missing values
-attach(data)
-H0 <- data.frame(lwage, educ,fatheduc, exper,expersq ,black ,south ,smsa ,smsa66,reg661, reg662 ,reg663, reg664,
-reg665, reg666 ,reg667,reg668)
-Y <- as.character(colnames(H0))[1] ###OUTCOME variable
-X <-as.character(colnames(H0))[2] ###ENDOEGENOUS variable
-Z <-as.character(colnames(H0))[3] ###IV variable
-H <-as.character(colnames(H0))[-(1:3)] ##### EXOGENOUS variables
-result <- iv_cr_test(data,X,Y,H,Z,  n, k=-1,alpha = 0.05,seed = 123,rxu_range = c(0, 0.8))
-print(result)
+\donttest{
+data <- wooldridge::card
+H <- c("exper", "expersq", "black", "south", "smsa", "smsa66",
+       "reg661", "reg662", "reg663", "reg664",
+       "reg665", "reg666", "reg667", "reg668")
+# Card (1993): ability bias implies corr(educ, u) > 0, hence k = +1.
+res <- iv_cr_test(data, X = "educ", Y = "lwage", H = H,
+                  Z = c("fatheduc", "motheduc", "nearc2", "nearc4"),
+                  k = 1, alpha = 0.05, rxu_range = c(0, 0.8))
+print(res)
+}
 }

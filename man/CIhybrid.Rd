@@ -2,7 +2,7 @@
 % Please edit documentation in R/CIhybrid.R
 \name{CIhybrid}
 \alias{CIhybrid}
-\title{Returns final confidence intervals}
+\title{Modified conditional union-bound confidence interval}
 \usage{
 CIhybrid(
   deltahat,
@@ -17,39 +17,54 @@ CIhybrid(
   tol,
   tol_r,
   index,
-  g
+  g,
+  seed = 0L
 )
 }
 \arguments{
-\item{deltahat}{row or column vectors/matrices.}
+\item{deltahat}{Numeric vector, the point estimate being perturbed.}
 
-\item{deltaSigma}{(B x k) matrix}
+\item{deltaSigma}{Sampling covariance matrix of \code{deltahat}.}
 
-\item{Al}{constraint matrices}
+\item{Al, Au}{Constraint matrices; equal in the degenerate-bound case.}
 
-\item{Au}{constraint matrices}
+\item{alpha}{Nominal level.}
 
-\item{alpha, }{critical levels}
+\item{alphac}{Conditional level; admissible when in (alpha/2, alpha).}
 
-\item{alphac}{critical levels}
+\item{eta}{Lower-truncation confidence level for the auxiliary set.}
 
-\item{eta}{critical area level}
+\item{B, Blarge}{Numbers of Gaussian draws.}
 
-\item{B, }{number of repetitions for bootstrap}
+\item{tol}{Bisection tolerance.}
 
-\item{Blarge}{number of repetitions for bootstrap}
+\item{tol_r}{Tolerance for the pairwise-correlation screen in the truncation
+bounds. See \code{\link{cr_corr_screen}} for a diagnostic of how many grid
+pairs this removes at a given grid size.}
 
-\item{tol}{tolerance for correlation threshold}
+\item{index}{Optional indices of \code{deltahat} to hold at zero; may be NULL.}
 
-\item{tol_r}{tolerance for correlation threshold}
+\item{g}{Mapping returning the grid-level lambda values.}
 
-\item{index}{index number}
-
-\item{g}{mapping function returning lambda estimates}
+\item{seed}{Integer seed. The RNG state of the calling session is saved on
+entry and restored on exit.}
 }
 \value{
-Return final confidence intervals
+A list with the hybrid, conditional and projection intervals, the
+  least-favourable point reached, and the calibrated critical value.
 }
 \description{
-Returns final confidence intervals
+Returns the modified conditional interval of Bei (2024), obtained as the
+union of the calibrated projection interval and the conditional interval,
+corresponding to the critical value \eqn{\hat c_m(\theta;\alpha) =
+\max\{\hat c_c(\theta;\alpha_c), \hat c_t\}}.
+}
+\details{
+The routine is parameterisation-agnostic. Under the reparameterised route of
+Remark A.1 it is called with \code{deltahat} the two-dimensional
+\eqn{\hat\delta}, \code{deltaSigma} the 2x2 \eqn{\hat\Omega_\delta}, and
+\code{Al = Au = A} the known K x 2 grid matrix, with \code{g} the linear map
+\eqn{\delta \mapsto A\delta}. Under the primitive route it is called with the
+three-dimensional \eqn{\hat\rho}, the 3x3 \eqn{\hat\Sigma_\rho}, the estimated
+gradient array, and the nonlinear \code{g}.
 }

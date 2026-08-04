@@ -2,30 +2,88 @@
 % Please edit documentation in R/check_compatibility.R
 \name{check_compatibility}
 \alias{check_compatibility}
-\title{Computes the CIs and probabilities}
+\title{Compute the CR test intervals for one instrument}
 \usage{
-check_compatibility(df, i = 1, n, k = 1, alpha = 0.05, rxu_range = rxu_range)
+check_compatibility(
+  df,
+  i = 1L,
+  n = NULL,
+  k = 1,
+  alpha = 0.05,
+  rxu_range = c(0, 0.8),
+  K = 80L,
+  route = c("reparam", "primitive"),
+  B_boot = 800L,
+  B = 500L,
+  Blarge = 5000L,
+  eta = 0.001,
+  tol = 0.001,
+  tol_r = 0.001,
+  B_im = 999L,
+  seed = 1L,
+  compute_pvalue = TRUE,
+  verbose = TRUE
+)
 }
 \arguments{
-\item{n}{Numeric scalar for size of the variables.}
+\item{df}{Data frame containing columns \code{x}, \code{y}, \code{z}.}
 
-\item{k}{Numeric scalar for direction of endogenity.}
+\item{i}{Integer label for the instrument, used in messages and seeds.}
 
-\item{alpha}{Numeric scalar for the level of H0 test.}
+\item{n}{Ignored; determined internally from \code{df}.}
 
-\item{rxu_range}{Numeric interval for r_xu values.}
+\item{k}{Sign of the maintained endogeneity restriction, +1 or -1. Used only
+to validate \code{rxu_range}.}
 
-\item{data}{Data frame}
+\item{alpha}{Numeric significance level.}
 
-\item{seed}{Numeric scalar  for reproducibility.}
+\item{rxu_range}{Numeric vector of length 2 giving the admissible domain D.}
 
-\item{bias_mc}{Logial value.}
+\item{K}{Integer number of equally spaced grid points. Default 80, matching
+Remark 3.3 and Table 6.}
 
-\item{mc_B}{Numeric scalar for MC correction simulations.}
+\item{route}{Either \code{"reparam"} or \code{"primitive"}.}
+
+\item{B_boot}{Integer bootstrap replications for the covariance of rho_hat.}
+
+\item{B, Blarge}{Numbers of Gaussian draws in the MCUB calculation.}
+
+\item{eta}{Lower-truncation confidence level.}
+
+\item{tol, tol_r}{Tolerances passed to the MCUB routines.}
+
+\item{B_im}{Integer bootstrap replications for the IM/Stoye endpoint standard
+errors.}
+
+\item{seed}{Integer seed.}
+
+\item{compute_pvalue}{Logical; whether to invert the interval over the
+admissible range of alpha. This is the expensive step.}
+
+\item{verbose}{Logical; print progress.}
 }
 \value{
-CIs and probabilities.
+A one-row data frame of results, with diagnostics attached as the
+  \code{"diagnostics"} attribute.
 }
 \description{
-Computes the CIs and probabilities
+Constructs the MCUB confidence interval for the scalar partially identified
+parameter \eqn{\theta_0 = \rho_{zu}}, together with the Imbens-Manski/Stoye
+diagnostic interval and the naive selected-endpoint benchmark, on a fixed
+finite grid over the admissible domain D.
+}
+\details{
+Two routes are available. \code{route = "reparam"} is the default and
+implements Remark A.1: the Gaussian simulation is carried out entirely in the
+exact two-dimensional reparameterised experiment, with the known K x 2 matrix
+\eqn{A} and \eqn{\hat\Omega_\delta = J(\hat\rho)\hat\Sigma_\rho J(\hat\rho)'}.
+\code{route = "primitive"} draws in the three-dimensional space of
+\eqn{\hat\rho} and evaluates the nonlinear map, with the estimated gradient
+array in place of \eqn{A}. The two schemes differ by \eqn{o_p(1)} and give
+numerically identical grid-level standard errors by equation (12), but only
+the first matches the theory exactly, since \eqn{A} involves no estimated
+quantity.
+
+All covariance quantities are on the estimator scale, \eqn{\hat\Sigma_{\rho,n}
+= \widehat{Var}(\hat\rho)}, so no further division by n is applied anywhere.
 }
