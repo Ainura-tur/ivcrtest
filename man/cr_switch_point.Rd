@@ -10,7 +10,7 @@ cr_switch_point(
   k = 1,
   direction = c("below", "above"),
   bracket = NULL,
-  scan_grid = seq(0.05, 0.75, by = 0.1),
+  scan_grid = c(0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.35, 0.5, 0.65, 0.75),
   steps = 6L,
   alpha = 0.05,
   K = 80L,
@@ -40,7 +40,10 @@ on any exogenous controls.}
 \item{bracket}{Optional length-2 bracket in absolute value. When NULL a
 coarse scan on \code{scan_grid} locates one.}
 
-\item{scan_grid}{Grid used to bracket the switch when \code{bracket} is NULL.}
+\item{scan_grid}{Grid used to bracket the switch when \code{bracket} is NULL.
+Spaced finely near zero: a strong instrument with small
+\eqn{\hat\Omega_\delta} can switch below 0.05, and a grid starting there
+would report \code{"rejects throughout"} rather than locating it.}
 
 \item{steps}{Integer bisection steps. Resolution is
 \code{diff(bracket) / 2^steps}.}

@@ -1,4 +1,3 @@
-
 #' Valid range and breakdown range for the endogeneity magnitude
 #'
 #' Implements the sensitivity analysis of Section 3.5. For a sequence of cut
@@ -273,6 +272,9 @@ cr_pointwise_range <- function(df,
 #' @param bracket Optional length-2 bracket in absolute value. When NULL a
 #'   coarse scan on \code{scan_grid} locates one.
 #' @param scan_grid Grid used to bracket the switch when \code{bracket} is NULL.
+#'   Spaced finely near zero: a strong instrument with small
+#'   \eqn{\hat\Omega_\delta} can switch below 0.05, and a grid starting there
+#'   would report \code{"rejects throughout"} rather than locating it.
 #' @param steps Integer bisection steps. Resolution is
 #'   \code{diff(bracket) / 2^steps}.
 #' @param alpha,K,route,B,Blarge,eta,tol,tol_r Passed through to the MCUB fit.
@@ -288,7 +290,8 @@ cr_switch_point <- function(df,
                             k         = 1,
                             direction = c("below", "above"),
                             bracket   = NULL,
-                            scan_grid = seq(0.05, 0.75, by = 0.10),
+                            scan_grid = c(0.005, 0.01, 0.02, 0.05, 0.10,
+                                          0.20, 0.35, 0.50, 0.65, 0.75),
                             steps     = 6L,
                             alpha     = 0.05,
                             K         = 80L,
