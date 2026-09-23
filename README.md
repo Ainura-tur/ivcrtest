@@ -12,7 +12,7 @@ naive selected-endpoint intervals reported alongside as diagnostics.
 ## Install
 
 ```r
-remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git")
+remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git", ref = "v0.2.0")
 library(ivcrtest)
 ```
 
