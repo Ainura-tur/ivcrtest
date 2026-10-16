@@ -50,14 +50,11 @@ orthogonality restriction remains compatible with the data, that is
 \eqn{A(t) = (t, -\sqrt{1-t^2})}.
 }
 \details{
-This is the quantity the Table 5 note describes, the subinterval of assumed
-\eqn{\rho_{xu}} values for which zero lies in the interval. It differs from
-\code{\link{cr_valid_range}}, which implements the two-sided infimum and
-supremum construction over nested domains. Because identified sets are nested
-in the domain, that construction returns the endpoints of the search grid
-whenever either direction admits any acceptance, so it cannot produce the
-narrow ranges the sensitivity discussion refers to. The pointwise version
-discriminates, needs no MCUB fit, and is therefore fast.
+It is a fast screen, not the valid range of Section 3.5. That range is
+defined through the MCUB test on nested domains: \code{\link{cr_valid_range}}
+computes it on a grid of cut points and \code{\link{cr_switch_point}} refines
+an endpoint by bisection. The pointwise set needs no MCUB fit and usually
+lies close to the valid range, which is the more conservative of the two.
 
 At a single \eqn{t} the identified set is the point \eqn{g(\rho;t)}, so the
 relevant interval is the ordinary normal one and no union bound arises.

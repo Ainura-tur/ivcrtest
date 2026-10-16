@@ -29,7 +29,13 @@
 #'   default changed to \code{+1}, since the previous default of \code{-1} was
 #'   inconsistent with the default positive \code{rxu_range}.
 #' @param alpha Numeric significance level. Forwarded, not ignored.
-#' @param seed Integer seed. Forwarded, not ignored.
+#' @param seed Integer seed for the Monte Carlo draws of the MCUB interval and
+#'   the p-value inversion. It does not set the bootstrap draws; see
+#'   \code{boot_seed}.
+#' @param boot_seed Integer seed for the bootstraps of the covariance of rho_hat
+#'   and of the IM/Stoye standard errors. Instrument \code{j} uses
+#'   \code{boot_seed + j}. When NULL, the default, instrument \code{j} uses
+#'   \code{1000 + j}, which reproduces version 0.2.0 and the paper.
 #' @param rxu_range Numeric vector of length 2 giving D. When NULL it defaults to
 #'   \code{c(0, 0.8)} if \code{k > 0} and \code{c(-0.8, 0)} if \code{k < 0}.
 #' @param K Integer number of equally spaced grid points. Default 80.
@@ -68,6 +74,7 @@ iv_cr_test <- function(data, X, Y, H, Z,
                        k              = 1,
                        alpha          = 0.05,
                        seed           = 123L,
+                       boot_seed      = NULL,
                        rxu_range      = NULL,
                        K              = 80L,
                        route          = c("reparam", "primitive"),
@@ -156,7 +163,9 @@ iv_cr_test <- function(data, X, Y, H, Z,
     res <- check_compatibility(df, i = j, k = k,
                                alpha = alpha, rxu_range = rxu_range,
                                K = K, route = route, B_boot = B_boot,
-                               seed = seed, compute_pvalue = compute_pvalue,
+                               seed = seed,
+                               boot_seed = if (is.null(boot_seed)) NULL else boot_seed + j,
+                               compute_pvalue = compute_pvalue,
                                verbose = verbose, ...)
     if (is.null(res)) next
 
@@ -197,8 +206,28 @@ print.iv_cr_test <- function(x, ...) {
   cols <- c("Z", "n", "plug_in", "CI_MCUB", "CI_IM", "CI_naive",
             "Zero_in_CI_MCUB", "Zero_in_CI_IM", "p_adm_label", "G_hat", "status")
   cols <- intersect(cols, names(x$results))
-  print(x$results[, cols, drop = FALSE], row.names = FALSE)
+  print(.cr_marks_for_display(x$results[, cols, drop = FALSE]), row.names = FALSE)
   cat("\nMCUB is the primary procedure; IM/Stoye and the naive endpoint interval",
       "\nare reported as diagnostics. p_adm is censored to the admissible range.\n")
   invisible(x)
 }
+
+# In a session whose locale is not UTF-8, print shows the check mark and the
+# cross as <U+2713> and <U+00D7>. Replace them with words for display only;
+# the stored columns are unchanged.
+.cr_marks_for_display <- function(tab, utf8 = isTRUE(l10n_info()[["UTF-8"]])) {
+  if (utf8) return(tab)
+  mark_cols <- intersect(c("Zero_in_CI_MCUB", "Zero_in_CI_IM", "Zero_in_naive"),
+                         names(tab))
+  for (cc in mark_cols) {
+    v <- enc2utf8(as.character(tab[[cc]]))
+    tab[[cc]] <- ifelse(is.na(v), NA_character_,
+                        ifelse(v == .cr_tick(), "yes",
+                               ifelse(v == .cr_cross(), "no", v)))
+  }
+  tab
+}
+
+# The two marks, built from code points so that they are UTF-8 in every locale.
+.cr_tick  <- function() intToUtf8(0x2713L)
+.cr_cross <- function() intToUtf8(0x00D7L)

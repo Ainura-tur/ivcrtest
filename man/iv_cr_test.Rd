@@ -14,6 +14,7 @@ iv_cr_test(
   k = 1,
   alpha = 0.05,
   seed = 123L,
+  boot_seed = NULL,
   rxu_range = NULL,
   K = 80L,
   route = c("reparam", "primitive"),
@@ -46,7 +47,14 @@ inconsistent with the default positive \code{rxu_range}.}
 
 \item{alpha}{Numeric significance level. Forwarded, not ignored.}
 
-\item{seed}{Integer seed. Forwarded, not ignored.}
+\item{seed}{Integer seed for the Monte Carlo draws of the MCUB interval and
+the p-value inversion. It does not set the bootstrap draws; see
+\code{boot_seed}.}
+
+\item{boot_seed}{Integer seed for the bootstraps of the covariance of rho_hat
+and of the IM/Stoye standard errors. Instrument \code{j} uses
+\code{boot_seed + j}. When NULL, the default, instrument \code{j} uses
+\code{1000 + j}, which reproduces version 0.2.0 and the paper.}
 
 \item{rxu_range}{Numeric vector of length 2 giving D. When NULL it defaults to
 \code{c(0, 0.8)} if \code{k > 0} and \code{c(-0.8, 0)} if \code{k < 0}.}

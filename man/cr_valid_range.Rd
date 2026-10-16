@@ -12,10 +12,16 @@ cr_valid_range(
   alpha = 0.05,
   K = 80L,
   route = c("reparam", "primitive"),
+  Sigma_rho = NULL,
   B_boot = 800L,
-  seed = 1L,
-  verbose = TRUE,
-  ...
+  seed = 123L,
+  B = 500L,
+  Blarge = 5000L,
+  eta = 0.001,
+  tol = 0.001,
+  tol_r = 0.001,
+  eps = 0.001,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -33,36 +39,80 @@ residualised on any exogenous controls.}
 
 \item{K}{Integer number of grid points per domain.}
 
-\item{route}{Either \code{"reparam"} or \code{"primitive"}.}
+\item{route}{Only \code{"reparam"} is implemented.}
 
-\item{B_boot}{Integer bootstrap replications for the covariance of rho_hat.}
+\item{Sigma_rho}{Optional 3x3 sampling covariance of rho_hat. When NULL it is
+bootstrapped once and reused for every domain, since it does not depend on
+the domain.}
 
-\item{seed}{Integer seed.}
+\item{B_boot}{Integer bootstrap replications, used only when
+\code{Sigma_rho} is NULL.}
 
-\item{verbose}{Logical; print progress.}
+\item{seed}{Integer seed for the bootstrap of \code{Sigma_rho}.}
 
-\item{...}{Further arguments passed to \code{\link{check_compatibility}}.}
+\item{B, Blarge, eta, tol, tol_r}{Passed through to the MCUB fit
+(\code{\link{CIhybrid}}).}
+
+\item{eps}{Width of the edge domains \eqn{(0, \epsilon)} and
+\eqn{(\bar\rho - \epsilon, \bar\rho)}, fitted only when the smallest cut
+already accepts from above or the largest cut still accepts from below.
+They decide whether an endpoint reaches 0 or \eqn{\bar\rho}, as in the
+bisection routine used for Table 3 of the paper.}
+
+\item{verbose}{Logical; print each evaluation.}
 }
 \value{
-A list with the per-cut-point \code{table}, the \code{valid_range},
-  the \code{breakdown_range} and the settings used.
+A list with
+  \item{table}{one row per cut point: \code{rho_k} (signed),
+    \code{accept_from_below}, \code{accept_from_above};}
+  \item{full_domain_accepts}{zero-inclusion on the whole domain
+    \eqn{(0, \bar\rho)}, mirrored when \code{k = -1};}
+  \item{valid_range}{the signed valid range, in increasing order, or
+    \code{c(NA, NA)} when zero is excluded on the whole domain;}
+  \item{lower_bracket, upper_bracket}{signed brackets locating each
+    endpoint on the grid;}
+  \item{status}{\code{"range"}; \code{"rejects throughout"} when zero is
+    excluded on the full domain; or \code{"below grid resolution"} when both
+    endpoints fall between the same pair of cut points, in which case
+    \code{valid_range} is \code{NA} and the brackets locate it;}
+  \item{breakdown_range}{the complement of the valid range within the
+    signed domain, as text;}
+  and the settings used.
 }
 \description{
-Implements the sensitivity analysis of Section 3.5. For a sequence of cut
-points \eqn{\rho_k}, the MCUB interval is recomputed on the restricted domains
-\eqn{D_k = (\rho_k, \bar\rho)} and \eqn{D'_k = (0, \rho_k)} and zero-inclusion
-is recorded. The reported valid range is
-\eqn{[\rho^*_{xu}, \rho^{*}_{xu}]}, where the lower endpoint is the smallest
-\eqn{\rho_k} at which restricting from below yields acceptance and the upper
-endpoint is the largest \eqn{\rho_k} at which restricting from above yields
-acceptance. The breakdown range is the complement within \eqn{(0, \bar\rho)}.
+Implements the sensitivity analysis of Section 3.5 on a grid of cut points.
+For each cut point \eqn{\rho_k} the MCUB interval is recomputed on two
+restricted domains, and zero-inclusion is recorded:
+\itemize{
+  \item restricting from below, \eqn{\mathcal D_k = (\rho_k, \bar\rho)}.
+    Identified sets shrink as \eqn{\rho_k} rises, so acceptance is downward
+    closed in \eqn{\rho_k};
+  \item restricting from above, \eqn{\mathcal D'_k = (0, \rho_k)}.
+    Acceptance is upward closed in \eqn{\rho_k}.
+}
+Following Section 3.5, the upper endpoint of the valid range is
+\eqn{\bar\rho^*_{xu} = \sup\{\rho^* : 0 \in \mathrm{CI}_{\mathrm{MCUB}}
+\textrm{ when } \mathcal D = (\rho^*, \bar\rho)\}}, taken from the
+"from below" family, and the lower endpoint is
+\eqn{\underline\rho^*_{xu} = \inf\{\rho^* : 0 \in \mathrm{CI}_{\mathrm{MCUB}}
+\textrm{ when } \mathcal D = (0, \rho^*)\}}, taken from the "from above"
+family. Assuming \eqn{\rho_{xu} \ge \rho^*} rejects the instrument once
+\eqn{\rho^*} exceeds the upper endpoint, and assuming
+\eqn{\rho_{xu} \le \rho^*} rejects it once \eqn{\rho^*} falls below the
+lower endpoint.
 }
 \details{
-A narrow valid range means acceptance is sensitive to the assumed magnitude
-of endogeneity; a wide one means validity is robust across plausible
-magnitudes. A breakdown range reaching very small values means the instrument
-is rejected even under mild endogeneity assumptions.
+On a grid each endpoint is known only up to the bracket between two
+adjacent cut points. The reported endpoint is the grid value that still
+accepts, and the bracket is returned alongside it. Use
+\code{\link{cr_switch_point}} to refine an endpoint inside its bracket; with
+the same \code{Sigma_rho} and \code{seed} the two functions use identical
+MCUB fits and therefore agree.
 
 The negative branch is handled by mirroring: with \code{k = -1} the domains
-are \eqn{(-\bar\rho, \rho_k)} and \eqn{(\rho_k, 0)} for negative cut points.
+are \eqn{(-\bar\rho, -\rho_k)} and \eqn{(-\rho_k, 0)}, and the valid range is
+reported with its sign.
+}
+\seealso{
+\code{\link{cr_switch_point}} to refine an endpoint by bisection.
 }
