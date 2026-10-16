@@ -36,12 +36,20 @@
 #' @param tol,tol_r Tolerances passed to the MCUB routines.
 #' @param B_im Integer bootstrap replications for the IM/Stoye endpoint standard
 #'   errors.
-#' @param seed Integer seed.
+#' @param seed Integer seed for the Monte Carlo draws of the MCUB interval and
+#'   of the p-value inversion.
+#' @param boot_seed Integer seed for the two bootstraps: the covariance of
+#'   rho_hat and the IM/Stoye endpoint standard errors. When NULL, the default,
+#'   it is \code{1000 + i}, which reproduces version 0.2.0 and the paper. Set it
+#'   to make the bootstrap draws depend on your own seed.
 #' @param compute_pvalue Logical; whether to invert the interval over the
 #'   admissible range of alpha. This is the expensive step.
 #' @param verbose Logical; print progress.
 #' @return A one-row data frame of results, with diagnostics attached as the
-#'   \code{"diagnostics"} attribute.
+#'   \code{"diagnostics"} attribute. The columns \code{Zero_in_CI_MCUB},
+#'   \code{Zero_in_CI_IM} and \code{Zero_in_naive} hold a check mark or a cross
+#'   for display; \code{zero_in_mcub}, \code{zero_in_im} and
+#'   \code{zero_in_naive} hold the same results as logicals, for computation.
 #' @export
 #' @importFrom stats complete.cases cor qnorm
 
@@ -58,10 +66,15 @@ check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
                                 tol_r          = 1e-3,
                                 B_im           = 999L,
                                 seed           = 1L,
+                                boot_seed      = NULL,
                                 compute_pvalue = TRUE,
                                 verbose        = TRUE) {
 
   route <- match.arg(route)
+  if (is.null(boot_seed)) boot_seed <- 1000L + i
+  if (!(length(boot_seed) == 1L && is.finite(boot_seed))) {
+    stop("check_compatibility: boot_seed must be a single finite number or NULL.")
+  }
 
   if (!all(c("x", "y", "z") %in% names(df))) {
     stop("check_compatibility: df must contain columns 'x', 'y', 'z'.")
@@ -103,7 +116,7 @@ check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
   rho_hat <- c(rho_xy = cor(df$x, df$y),
                rho_xz = cor(df$x, df$z),
                rho_yz = cor(df$y, df$z))
-  Sigma_rho <- estimate_cov_corr_boot(df$x, df$y, df$z, B = B_boot, seed = 1000L + i)
+  Sigma_rho <- estimate_cov_corr_boot(df$x, df$y, df$z, B = B_boot, seed = boot_seed)
 
   r_grid <- seq(rxu_range[1], rxu_range[2], length.out = K)
 
@@ -207,7 +220,7 @@ check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
                        },
                        x_col = "x", y_col = "y", z_col = "z",
                        se_method = "bootstrap", B = B_im, alpha = alpha,
-                       seed = 1000L + i)
+                       seed = boot_seed)
   }, error = function(e) {
     status <<- c(status, paste0("im:", conditionMessage(e)))
     NULL
@@ -221,7 +234,10 @@ check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
     if (any(!is.finite(ci))) return(NA)
     ci[1] <= 0 && 0 <= ci[2]
   }
-  mark <- function(v) if (is.na(v)) NA_character_ else if (isTRUE(v)) "\u2713" else "\u00d7"
+  # intToUtf8() always returns a UTF-8 string. A "\u2713" literal is stored
+  # without an encoding mark when the package is installed in a non-UTF-8
+  # locale, and then fails to match the same glyph parsed as UTF-8.
+  mark <- function(v) if (is.na(v)) NA_character_ else if (isTRUE(v)) .cr_tick() else .cr_cross()
 
   fmt <- function(ci) {
     if (any(!is.finite(ci))) NA_character_ else sprintf("[%.3f, %.3f]", ci[1], ci[2])
@@ -240,6 +256,11 @@ check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
     Zero_in_CI_MCUB = mark(zero_in(CI_mcub)),
     Zero_in_CI_IM   = mark(if (is.na(reject_IM)) NA else !reject_IM),
     Zero_in_naive   = mark(zero_in(CI_naive)),
+    # Logical versions for computation. The mark columns above are kept for
+    # display and for callers that compare against them.
+    zero_in_mcub    = zero_in(CI_mcub),
+    zero_in_im      = if (is.na(reject_IM)) NA else !reject_IM,
+    zero_in_naive   = zero_in(CI_naive),
     p_adm           = p_adm,
     p_adm_label     = p_lab,
     G_hat           = gap_diag$G,

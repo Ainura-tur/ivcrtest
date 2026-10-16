@@ -21,6 +21,7 @@ check_compatibility(
   tol_r = 0.001,
   B_im = 999L,
   seed = 1L,
+  boot_seed = NULL,
   compute_pvalue = TRUE,
   verbose = TRUE
 )
@@ -55,7 +56,13 @@ Remark 3.3 and Table 6.}
 \item{B_im}{Integer bootstrap replications for the IM/Stoye endpoint standard
 errors.}
 
-\item{seed}{Integer seed.}
+\item{seed}{Integer seed for the Monte Carlo draws of the MCUB interval and
+of the p-value inversion.}
+
+\item{boot_seed}{Integer seed for the two bootstraps: the covariance of
+rho_hat and the IM/Stoye endpoint standard errors. When NULL, the default,
+it is \code{1000 + i}, which reproduces version 0.2.0 and the paper. Set it
+to make the bootstrap draws depend on your own seed.}
 
 \item{compute_pvalue}{Logical; whether to invert the interval over the
 admissible range of alpha. This is the expensive step.}
@@ -64,7 +71,10 @@ admissible range of alpha. This is the expensive step.}
 }
 \value{
 A one-row data frame of results, with diagnostics attached as the
-  \code{"diagnostics"} attribute.
+  \code{"diagnostics"} attribute. The columns \code{Zero_in_CI_MCUB},
+  \code{Zero_in_CI_IM} and \code{Zero_in_naive} hold a check mark or a cross
+  for display; \code{zero_in_mcub}, \code{zero_in_im} and
+  \code{zero_in_naive} hold the same results as logicals, for computation.
 }
 \description{
 Constructs the MCUB confidence interval for the scalar partially identified

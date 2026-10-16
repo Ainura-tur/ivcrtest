@@ -1,7 +1,7 @@
 Package: ivcrtest
 Type: Package
 Title: Correlation-Restriction Test for Instrument Validity
-Version: 0.2.0
+Version: 0.2.1
 Authors@R: c(
     person("Ratbek", "Dzhumashev", email= "ratbek.dzhumashev@monash.edu", role = c("aut", "cre")),
     person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@csiro.au", role = "aut"))
