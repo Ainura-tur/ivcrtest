@@ -1,20 +1,60 @@
 
-#' Imbens-Manski/Stoye inference for identified set
-#' @param data Data frame.
-#' @param grid_r_xu Numeric vector of grid points.
-#' @param g_fun Function mapping rho and r_xu to lambda.
+#' Imbens-Manski/Stoye interval for the identified set
+#'
+#' Computes the Imbens and Manski (2004) and Stoye (2009) confidence interval
+#' for a parameter whose identified set is \eqn{[\theta_l, \theta_u]}, where
+#' \eqn{\theta_l} and \eqn{\theta_u} are the minimum and maximum of
+#' \code{g_fun(rho_hat, r)} over the grid. Endpoint standard errors come from
+#' the bootstrap or the delta method. The critical value solves
+#' \eqn{\Phi(c + \hat\Delta/\hat s) - \Phi(-c) = 1 - \alpha}, where
+#' \eqn{\hat\Delta} is the width of the estimated set and \eqn{\hat s} the
+#' larger endpoint standard error; see \code{\link{solve_c_im}}. The function
+#' also reports whether zero lies outside the interval.
+#' \code{\link{check_compatibility}} reports this interval as a diagnostic
+#' alongside the MCUB interval.
+#'
+#' @param data Data frame containing the three variables.
+#' @param grid_r_xu Numeric vector of grid points for \eqn{\rho_{xu}}.
+#' @param g_fun Function \code{g_fun(rho, r)} returning the grid map at the
+#'   correlation vector \code{rho}, ordered (rho_xy, rho_xz, rho_yz), and the
+#'   grid point or points \code{r}.
 #' @param alpha Numeric significance level.
-#' @param se_method Character, either "bootstrap" or "delta".
+#' @param se_method Either \code{"bootstrap"} or \code{"delta"}.
 #' @param B Integer number of bootstrap replications.
-#' @param grad_fun Optional gradient function for delta method.
-#' @param cov_rho Optional pre-computed covariance matrix.
-#' @param seed Integer seed for reproducibility.
-#' @param x_col Name of x column.
-#' @param y_col Name of y column.
-#' @param z_col Name of z column.
-#' @param return_boot Logical, whether to return bootstrap draws.
-#' @return List with CI_IM, reject_H0_0_in_C, and diagnostics.
+#' @param grad_fun Used when \code{se_method = "delta"}: a function
+#'   \code{grad_fun(rho, r)} returning the gradient of the grid map with
+#'   respect to \code{rho}.
+#' @param cov_rho Used when \code{se_method = "delta"}: an optional 3x3
+#'   covariance of \eqn{\hat\rho} on the estimator scale. It is bootstrapped
+#'   when NULL.
+#' @param seed Integer seed for the bootstrap draws, or NULL to use the
+#'   current random-number stream. The caller's random-number state is
+#'   restored on exit.
+#' @param x_col,y_col,z_col Names of the regressor, outcome and instrument
+#'   columns in \code{data}.
+#' @param return_boot Logical; whether to return the bootstrap endpoint draws.
+#' @return A list with the interval \code{CI_IM}; the logical
+#'   \code{reject_H0_0_in_C}, TRUE when zero lies outside the interval; the
+#'   plug-in endpoints \code{theta_l_hat} and \code{theta_u_hat}; their
+#'   standard errors \code{se_l} and \code{se_u}; the critical value
+#'   \code{c_alpha}; and the inputs used.
+#' @references Imbens, G. W. and C. F. Manski (2004). Confidence intervals for
+#'   partially identified parameters. \emph{Econometrica} 72(6), 1845--1857.
+#'
+#'   Stoye, J. (2009). More on confidence intervals for partially identified
+#'   parameters. \emph{Econometrica} 77(4), 1299--1315.
 #' @export
+#' @examples
+#' set.seed(1)
+#' n <- 300
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' df <- data.frame(x = x, y = y, z = z)
+#' g <- function(rho, r) as.numeric(cr_Amat(r) %*% cr_delta(rho))
+#' res <- im_stoye_inference(df, seq(0, 0.8, length.out = 20), g_fun = g,
+#'                           B = 199)
+#' res$CI_IM
+#' res$reject_H0_0_in_C
 im_stoye_inference <- function(data,
                                grid_r_xu,
                                g_fun,                 # function(rho_vec, r_xu) -> lambda
@@ -63,7 +103,7 @@ im_stoye_inference <- function(data,
   # Step 3: Compute standard errors for endpoints
   boot_endpoints <- NULL
 
-  if (!is.null(seed)) set.seed(seed)
+  .cr_local_seed(seed)
 
   if (se_method == "bootstrap") {
     # Bootstrap standard errors

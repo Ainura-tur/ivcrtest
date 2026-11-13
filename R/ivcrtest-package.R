@@ -6,6 +6,6 @@
 #'
 #' @keywords internal
 #' @importFrom stats as.formula coef complete.cases cor cov lm median optim
-#'   pnorm qnorm quantile resid rnorm sd var
+#' @importFrom stats pnorm qnorm quantile resid rnorm sd var
 #' @importFrom MASS mvrnorm
 "_PACKAGE"

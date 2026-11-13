@@ -1,3 +1,6 @@
+# Adapted from CI_ModifiedConditional() in the UnionBounds package by Xinyue
+# Bei (https://github.com/xinyuebei-econ/UnionBounds), MIT licence,
+# Copyright (c) 2024 Xinyue Bei. See inst/COPYRIGHTS.
 
 #' Modified conditional union-bound confidence interval
 #'
@@ -31,9 +34,34 @@
 #'   entry and restored on exit.
 #' @return A list with the hybrid, conditional and projection intervals, the
 #'   least-favourable point reached, and the calibrated critical value.
+#' @source Adapted from \code{CI_ModifiedConditional()} in the UnionBounds
+#'   package by Xinyue Bei, \url{https://github.com/xinyuebei-econ/UnionBounds},
+#'   MIT licence. See the file \file{COPYRIGHTS} installed with ivcrtest.
+#' @references Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+#'   5023605. \doi{10.2139/ssrn.5023605}
+#' @seealso \code{\link{check_compatibility}}, which calls this routine with
+#'   the settings used in the paper.
 #' @export
 #' @importFrom stats qnorm quantile optim
 #' @importFrom MASS mvrnorm
+#' @examples
+#' # Simulated data with a valid instrument z and corr(x, u) > 0.
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' rho <- c(cor(x, y), cor(x, z), cor(y, z))
+#' Sigma_rho <- estimate_cov_corr_boot(x, y, z, B = 200)
+#'
+#' # Reparameterised route on a 20-point grid over D = [0, 0.8]. Small B,
+#' # Blarge and a coarse tol keep the example fast; use the defaults of
+#' # check_compatibility() in practice.
+#' A <- cr_Amat(seq(0, 0.8, length.out = 20))
+#' fit <- CIhybrid(cr_delta(rho), cr_omega_delta(rho, Sigma_rho), A, A,
+#'                 alpha = 0.05, alphac = 0.04, eta = 0.001,
+#'                 B = 100, Blarge = 1000, tol = 0.01, tol_r = 0.001,
+#'                 index = NULL, g = cr_grid_map(A), seed = 1)
+#' fit$CI_h
 
 CIhybrid <- function(deltahat, deltaSigma, Al, Au,
                      alpha, alphac, eta,
@@ -41,20 +69,8 @@ CIhybrid <- function(deltahat, deltaSigma, Al, Au,
                      tol, tol_r, index, g,
                      seed = 0L) {
 
-  # ----- 0. Save and restore the caller's RNG stream -----
-  has_seed <- exists(".Random.seed", envir = globalenv(), inherits = FALSE)
-  old_seed <- if (has_seed) get(".Random.seed", envir = globalenv()) else NULL
-  on.exit({
-    if (is.null(old_seed)) {
-      if (exists(".Random.seed", envir = globalenv(), inherits = FALSE)) {
-        rm(".Random.seed", envir = globalenv())
-      }
-    } else {
-      assign(".Random.seed", old_seed, envir = globalenv())
-    }
-  }, add = TRUE)
-
-  set.seed(seed)
+  # ----- 0. Seed the draws; restore the caller's RNG stream on exit -----
+  .cr_local_seed(seed)
 
   # ----- 1. Random draws and basic quantities -----
   k_dim <- length(deltahat)

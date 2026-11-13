@@ -2,20 +2,27 @@
 % Please edit documentation in R/eval_g_on_grid.R
 \name{eval_g_on_grid}
 \alias{eval_g_on_grid}
-\title{Evaluates g function on a grid}
+\title{Evaluate a grid map at every grid point}
 \usage{
 eval_g_on_grid(g_fun, rho_vec, grid_r_xu)
 }
 \arguments{
-\item{g_fun}{Function mapping rho and r_xu to lambda.}
+\item{g_fun}{Function \code{g_fun(rho, r)} returning the grid map at the
+correlation vector \code{rho} and the grid point or points \code{r}.}
 
-\item{rho_vec}{Named numeric vector of correlations.}
+\item{rho_vec}{Numeric vector of correlations, ordered (rho_xy, rho_xz,
+rho_yz).}
 
 \item{grid_r_xu}{Numeric vector of grid points.}
 }
 \value{
-Numeric vector of g values.
+Numeric vector with one value per grid point.
 }
 \description{
-Evaluates g function on a grid
+Calls \code{g_fun(rho_vec, grid_r_xu)}. If \code{g_fun} is not vectorised
+over the grid, it is evaluated one grid point at a time instead.
+}
+\examples{
+g <- function(rho, r) as.numeric(cr_Amat(r) \%*\% cr_delta(rho))
+eval_g_on_grid(g, c(0.5, 0.4, 0.3), seq(0, 0.8, by = 0.2))
 }

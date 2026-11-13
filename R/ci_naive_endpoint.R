@@ -28,6 +28,14 @@
 #'   standard errors and the critical value used.
 #' @export
 #' @importFrom stats complete.cases cor qnorm
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' res <- ci_naive_endpoint(x, y, z, rxu_range = c(0, 0.8), K = 80,
+#'                          B_boot = 200)
+#' res$CI
 
 ci_naive_endpoint <- function(x, y, z,
                               rxu_range = c(0, 0.8),
@@ -105,6 +113,11 @@ ci_naive_endpoint <- function(x, y, z,
 #' @param make_psd Deprecated and ignored.
 #' @return See \code{\link{ci_naive_endpoint}}.
 #' @export
+#' @examples
+#' # Deprecated: call ci_naive_endpoint() instead.
+#' set.seed(1)
+#' x <- rnorm(200); y <- x + rnorm(200); z <- 0.5 * x + rnorm(200)
+#' suppressWarnings(ci_simple_union(x, y, z, B_boot = 100))$CI
 ci_simple_union <- function(x, y, z,
                             rxu_range   = c(0, 0.8),
                             grid_length = 80L,

@@ -2,7 +2,12 @@
 % Please edit documentation in R/CIproj_p.R
 \name{CIproj_p}
 \alias{CIproj_p}
-\title{# Return final projection indicator}
+\title{Simulated rejection probability for calibrating the projection critical value}
+\source{
+Adapted from \code{CIproj_p()} in the UnionBounds package by Xinyue
+  Bei, \url{https://github.com/xinyuebei-econ/UnionBounds}, MIT licence.
+  See the file \file{COPYRIGHTS} installed with ivcrtest.
+}
 \usage{
 CIproj_p(
   c,
@@ -24,41 +29,85 @@ CIproj_p(
 )
 }
 \arguments{
-\item{c}{modifier}
+\item{c}{Candidate critical value of the projection test.}
 
-\item{delta, }{d row or column vectors/matrices.}
+\item{delta}{Numeric vector, the point at which the probability is
+evaluated.}
 
-\item{alphac}{adjusted critical level}
+\item{alphac}{Level of the conditional test.}
 
-\item{c_bd}{critical value}
+\item{c_bd}{Radius of the auxiliary set in standardised units.}
 
-\item{deltastar_demean}{row or column vectors/matrices.}
+\item{deltastar_demean}{Matrix of mean-zero normal draws with covariance
+\code{deltaSigma}, one per row.}
 
-\item{Al}{constraint matrices}
+\item{Al, Au}{Matrices with one row per grid point that map \eqn{\delta} to
+the lower and upper bounds.}
 
-\item{Au}{constraint matrices}
+\item{sigma_l, sigma_u}{Standard deviations of the lower and upper
+grid-level bounds.}
 
-\item{sigma_l}{standard deviations of lambda_hat_l / u}
+\item{deltaSigma}{Sampling covariance matrix of \eqn{\hat\delta}, used to
+standardise the draws.}
 
-\item{sigma_u}{standard deviations of lambda_hat_l / u}
+\item{corr_m}{Correlation matrix between the lower bounds (rows) and the
+upper bounds (columns).}
 
-\item{deltaSigma}{(B x k) matrix}
+\item{corr_l, corr_u}{Correlation matrices of the lower bounds and of the
+upper bounds.}
 
-\item{corr_m}{correlation blocks}
+\item{eta}{Lower-truncation level, added to the rejection rate.}
 
-\item{corr_l}{correlation blocks}
+\item{tol_r}{Tolerance for the pairwise-correlation screen in
+\code{\link{CIcon_TNbounds}}.}
 
-\item{corr_u}{correlation blocks}
-
-\item{eta}{critical area level}
-
-\item{tol_r}{tolerance for correlation threshold}
-
-\item{g}{mapping function returning lambda estimates}
+\item{g}{Function mapping a matrix of \eqn{\delta} values, one per row, to
+the grid-level bounds, one column per grid point; for example
+\code{cr_grid_map(A)}.}
 }
 \value{
-Return final projection indicator
+Numeric scalar, the estimated rejection probability, or NA when it
+  is not finite.
 }
 \description{
-# Return final projection indicator
+Estimates, by simulation, the rejection probability of the modified
+conditional test of Bei (2024) at the point \code{delta} for a candidate
+projection critical value \code{c}. The draws are \code{delta} plus the rows
+of \code{deltastar_demean}. Only draws in the auxiliary set count: those
+whose largest standardised deviation is at most \code{c_bd}. At the lower
+endpoint, the midpoint and the upper endpoint of the plug-in bound, a draw
+rejects when both the projection test with critical value \code{c} and the
+conditional test at level \code{alphac} reject. The result is the larger
+of two rejection rates, one for the lower endpoint or the midpoint and one
+for the upper endpoint or the midpoint, plus \code{eta}.
+\code{\link{CIhybrid}} searches for the \code{c} at which this probability
+equals \code{alpha} at the least favourable \code{delta}.
+}
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+
+A <- cr_Amat(seq(0, 0.8, length.out = 20))
+V <- A \%*\% Omega \%*\% t(A)
+s <- sqrt(diag(V))
+C <- V / outer(s, s)
+
+draws <- MASS::mvrnorm(200, mu = c(0, 0), Sigma = Omega)
+dev <- apply(sweep(abs(draws), 2, sqrt(diag(Omega)), "/"), 1, max)
+c_bd <- quantile(dev, 1 - 0.001)
+
+# Rejection probability at the point estimate for c = 1.5
+CIproj_p(c = 1.5, delta = cr_delta(rho), alphac = 0.04, c_bd = c_bd,
+         deltastar_demean = draws, Al = A, Au = A,
+         sigma_l = s, sigma_u = s, deltaSigma = Omega,
+         corr_m = C, corr_l = C, corr_u = C,
+         eta = 0.001, tol_r = 0.001, g = cr_grid_map(A))
+}
+\references{
+Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+  5023605. \doi{10.2139/ssrn.5023605}
 }

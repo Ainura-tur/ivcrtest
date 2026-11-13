@@ -1,0 +1,45 @@
+ivcrtest includes code adapted from the UnionBounds R package by
+Xinyue Bei, https://github.com/xinyuebei-econ/UnionBounds, which
+accompanies
+
+  Bei, X. (2024). Inference on union bounds. SSRN Working Paper 5023605.
+  https://doi.org/10.2139/ssrn.5023605
+
+The adapted functions are:
+
+  R/CIhybrid.R        CIhybrid(), adapted from CI_ModifiedConditional()
+  R/CIcon.R           CIcon()
+  R/CIcon_TNbounds.R  CIcon_TNbounds()
+  R/CIproj_p.R        CIproj_p()
+
+The ivcrtest versions take a user-supplied map g, so that the grid-level
+bounds may be nonlinear in the estimated parameters. They also use
+stats::optim() in place of nloptr, take an explicit seed, and differ in
+their arguments and return values.
+
+UnionBounds is distributed under the MIT licence, which is reproduced
+below.
+
+------------------------------------------------------------------------
+
+MIT License
+
+Copyright (c) 2024 Xinyue Bei
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

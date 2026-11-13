@@ -113,6 +113,21 @@ The negative branch is handled by mirroring: with \code{k = -1} the domains
 are \eqn{(-\bar\rho, -\rho_k)} and \eqn{(-\rho_k, 0)}, and the valid range is
 reported with its sign.
 }
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+df <- data.frame(x = x, y = y, z = z)
+
+# Three cut points, a small grid and few draws keep the example fast; use
+# the defaults in applied work.
+vr <- cr_valid_range(df, rho_bar = 0.8, cut_grid = c(0.2, 0.4, 0.6),
+                     k = 1, K = 10, B_boot = 200, B = 50, Blarge = 500,
+                     tol = 0.01, verbose = FALSE)
+vr$table
+vr$valid_range
+}
 \seealso{
 \code{\link{cr_switch_point}} to refine an endpoint by bisection.
 }

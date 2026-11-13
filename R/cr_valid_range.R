@@ -74,6 +74,20 @@
 #' @seealso \code{\link{cr_switch_point}} to refine an endpoint by bisection.
 #' @export
 #' @importFrom stats complete.cases
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' df <- data.frame(x = x, y = y, z = z)
+#'
+#' # Three cut points, a small grid and few draws keep the example fast; use
+#' # the defaults in applied work.
+#' vr <- cr_valid_range(df, rho_bar = 0.8, cut_grid = c(0.2, 0.4, 0.6),
+#'                      k = 1, K = 10, B_boot = 200, B = 50, Blarge = 500,
+#'                      tol = 0.01, verbose = FALSE)
+#' vr$table
+#' vr$valid_range
 cr_valid_range <- function(df,
                            rho_bar   = 0.8,
                            cut_grid  = seq(0.1, 0.7, by = 0.1),
@@ -309,6 +323,16 @@ cr_valid_range <- function(df,
 #'   \code{segments} making up the set, \code{breakdown_range}, and the
 #'   evaluated \code{grid}, \code{g}, \code{se} and \code{included} vectors.
 #' @export
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' df <- data.frame(x = x, y = y, z = z)
+#'
+#' pr <- cr_pointwise_range(df, rxu_range = c(0, 0.8), k = 1, B_boot = 200)
+#' pr$range
+#' pr$breakdown_range
 cr_pointwise_range <- function(df,
                                rxu_range = NULL,
                                k         = 1,
@@ -422,6 +446,18 @@ cr_pointwise_range <- function(df,
 #'   \code{bracket} used, \code{n_fits}, and a \code{status} of
 #'   \code{"interior"}, \code{"accepts throughout"} or \code{"rejects throughout"}.
 #' @export
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' df <- data.frame(x = x, y = y, z = z)
+#'
+#' # A coarse scan, two bisection steps, a small grid and few draws keep the
+#' # example fast; use the defaults in applied work.
+#' cr_switch_point(df, rho_bar = 0.8, k = 1, direction = "below",
+#'                 scan_grid = c(0.2, 0.4, 0.6), steps = 2, K = 10,
+#'                 B_boot = 200, B = 50, Blarge = 500, tol = 0.01)
 cr_switch_point <- function(df,
                             rho_bar   = 0.8,
                             k         = 1,

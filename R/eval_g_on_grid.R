@@ -1,10 +1,19 @@
 
-#' Evaluates g function on a grid
-#' @param g_fun Function mapping rho and r_xu to lambda.
-#' @param rho_vec Named numeric vector of correlations.
+#' Evaluate a grid map at every grid point
+#'
+#' Calls \code{g_fun(rho_vec, grid_r_xu)}. If \code{g_fun} is not vectorised
+#' over the grid, it is evaluated one grid point at a time instead.
+#'
+#' @param g_fun Function \code{g_fun(rho, r)} returning the grid map at the
+#'   correlation vector \code{rho} and the grid point or points \code{r}.
+#' @param rho_vec Numeric vector of correlations, ordered (rho_xy, rho_xz,
+#'   rho_yz).
 #' @param grid_r_xu Numeric vector of grid points.
-#' @return Numeric vector of g values.
+#' @return Numeric vector with one value per grid point.
 #' @export
+#' @examples
+#' g <- function(rho, r) as.numeric(cr_Amat(r) %*% cr_delta(rho))
+#' eval_g_on_grid(g, c(0.5, 0.4, 0.3), seq(0, 0.8, by = 0.2))
 eval_g_on_grid <- function(g_fun, rho_vec, grid_r_xu) {
   # Evaluate g function on grid, handling both vectorized and non-vectorized cases
   out <- g_fun(rho_vec, grid_r_xu)

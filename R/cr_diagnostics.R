@@ -12,6 +12,15 @@
 #' @param K Integer number of equally spaced grid points.
 #' @param Sigma_rho 3x3 sampling covariance of rho_hat on the estimator scale.
 #' @param tol Numeric clamping tolerance.
+#' @examples
+#' rho <- c(rho_xy = 0.5, rho_xz = 0.4, rho_yz = 0.3)
+#' Sigma_rho <- matrix(c(4, 1, 1, 1, 9, 2, 1, 2, 6), 3, 3) / 1e4
+#' D <- c(0, 0.8)
+#'
+#' cr_sign_condition(rho, D)$holds
+#' cr_endpoint_gap(rho, Sigma_rho, D, K = 80)$G
+#' cr_discretization(rho, D, K = 80)
+#' cr_corr_screen(rho, Sigma_rho, D, K = 80)$share_screened
 #' @name cr_diagnostics
 NULL
 

@@ -2,24 +2,38 @@
 % Please edit documentation in R/estimate_cov_corr_boot.R
 \name{estimate_cov_corr_boot}
 \alias{estimate_cov_corr_boot}
-\title{Estimates bootstrap covariance of correlation vector}
+\title{Bootstrap covariance of the three sample correlations}
 \usage{
 estimate_cov_corr_boot(x, y, z, B = 800, seed = 123)
 }
 \arguments{
-\item{x}{Numeric vector.}
+\item{x}{Numeric vector, the residualised endogenous regressor.}
 
-\item{y}{Numeric vector.}
+\item{y}{Numeric vector, the residualised outcome.}
 
-\item{z}{Numeric vector.}
+\item{z}{Numeric vector, the residualised instrument.}
 
 \item{B}{Integer number of bootstrap replications.}
 
-\item{seed}{Integer seed for reproducibility.}
+\item{seed}{Integer seed for the bootstrap draws, or NULL to use the
+current random-number stream. The caller's random-number state is
+restored on exit.}
 }
 \value{
-A 3x3 covariance matrix.
+A 3x3 covariance matrix, ordered (rho_xy, rho_xz, rho_yz).
 }
 \description{
-Estimates bootstrap covariance of correlation vector
+Estimates \eqn{\hat\Sigma_\rho = \widehat{Var}(\hat\rho)}, the sampling
+covariance of \eqn{\hat\rho = (\hat\rho_{xy}, \hat\rho_{xz},
+\hat\rho_{yz})'}, by the nonparametric bootstrap. Rows with a missing value
+in \code{x}, \code{y} or \code{z} are dropped first. The estimate is on the
+estimator scale, so it is not divided by n. It is symmetrised and, if needed,
+moved to the nearest positive semi-definite matrix with
+\code{\link[Matrix]{nearPD}}.
+}
+\examples{
+set.seed(1)
+n <- 300
+x <- rnorm(n); y <- 0.5 * x + rnorm(n); z <- 0.4 * x + rnorm(n)
+estimate_cov_corr_boot(x, y, z, B = 200)
 }

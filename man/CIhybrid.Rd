@@ -3,6 +3,11 @@
 \name{CIhybrid}
 \alias{CIhybrid}
 \title{Modified conditional union-bound confidence interval}
+\source{
+Adapted from \code{CI_ModifiedConditional()} in the UnionBounds
+  package by Xinyue Bei, \url{https://github.com/xinyuebei-econ/UnionBounds},
+  MIT licence. See the file \file{COPYRIGHTS} installed with ivcrtest.
+}
 \usage{
 CIhybrid(
   deltahat,
@@ -67,4 +72,31 @@ Remark A.1 it is called with \code{deltahat} the two-dimensional
 \eqn{\delta \mapsto A\delta}. Under the primitive route it is called with the
 three-dimensional \eqn{\hat\rho}, the 3x3 \eqn{\hat\Sigma_\rho}, the estimated
 gradient array, and the nonlinear \code{g}.
+}
+\examples{
+# Simulated data with a valid instrument z and corr(x, u) > 0.
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Sigma_rho <- estimate_cov_corr_boot(x, y, z, B = 200)
+
+# Reparameterised route on a 20-point grid over D = [0, 0.8]. Small B,
+# Blarge and a coarse tol keep the example fast; use the defaults of
+# check_compatibility() in practice.
+A <- cr_Amat(seq(0, 0.8, length.out = 20))
+fit <- CIhybrid(cr_delta(rho), cr_omega_delta(rho, Sigma_rho), A, A,
+                alpha = 0.05, alphac = 0.04, eta = 0.001,
+                B = 100, Blarge = 1000, tol = 0.01, tol_r = 0.001,
+                index = NULL, g = cr_grid_map(A), seed = 1)
+fit$CI_h
+}
+\references{
+Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+  5023605. \doi{10.2139/ssrn.5023605}
+}
+\seealso{
+\code{\link{check_compatibility}}, which calls this routine with
+  the settings used in the paper.
 }

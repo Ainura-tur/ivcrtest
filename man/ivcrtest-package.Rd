@@ -27,5 +27,10 @@ Authors:
   \item Ainura Tursunalieva \email{ainura.tursunalieva@csiro.au}
 }
 
+Other contributors:
+\itemize{
+  \item Xinyue Bei (Union-bound routines adapted from the UnionBounds package; see inst/COPYRIGHTS) [contributor, copyright holder]
+}
+
 }
 \keyword{internal}

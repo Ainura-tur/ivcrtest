@@ -17,3 +17,14 @@
 \description{
 Print method for CR test results
 }
+\examples{
+set.seed(1)
+n <- 300
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+res <- iv_cr_test(data.frame(x = x, y = y, z = z), X = "x", Y = "y",
+                  H = NULL, Z = "z", K = 10, B_boot = 100,
+                  compute_pvalue = FALSE, verbose = FALSE,
+                  B = 50, Blarge = 500, B_im = 99)
+print(res)
+}

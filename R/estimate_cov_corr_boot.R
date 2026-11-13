@@ -1,15 +1,31 @@
 
-#' Estimates bootstrap covariance of correlation vector
-#' @param x Numeric vector.
-#' @param y Numeric vector.
-#' @param z Numeric vector.
+#' Bootstrap covariance of the three sample correlations
+#'
+#' Estimates \eqn{\hat\Sigma_\rho = \widehat{Var}(\hat\rho)}, the sampling
+#' covariance of \eqn{\hat\rho = (\hat\rho_{xy}, \hat\rho_{xz},
+#' \hat\rho_{yz})'}, by the nonparametric bootstrap. Rows with a missing value
+#' in \code{x}, \code{y} or \code{z} are dropped first. The estimate is on the
+#' estimator scale, so it is not divided by n. It is symmetrised and, if needed,
+#' moved to the nearest positive semi-definite matrix with
+#' \code{\link[Matrix]{nearPD}}.
+#'
+#' @param x Numeric vector, the residualised endogenous regressor.
+#' @param y Numeric vector, the residualised outcome.
+#' @param z Numeric vector, the residualised instrument.
 #' @param B Integer number of bootstrap replications.
-#' @param seed Integer seed for reproducibility.
-#' @return A 3x3 covariance matrix.
+#' @param seed Integer seed for the bootstrap draws, or NULL to use the
+#'   current random-number stream. The caller's random-number state is
+#'   restored on exit.
+#' @return A 3x3 covariance matrix, ordered (rho_xy, rho_xz, rho_yz).
 #' @export
+#' @examples
+#' set.seed(1)
+#' n <- 300
+#' x <- rnorm(n); y <- 0.5 * x + rnorm(n); z <- 0.4 * x + rnorm(n)
+#' estimate_cov_corr_boot(x, y, z, B = 200)
 
 estimate_cov_corr_boot <- function(x, y, z, B = 800, seed = 123) {
-  set.seed(seed)
+  .cr_local_seed(seed)
   dat <- cbind(x, y, z)
   dat <- dat[complete.cases(dat), , drop = FALSE]
   n <- nrow(dat)

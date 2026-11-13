@@ -1,11 +1,20 @@
 
-#' Estimates rho vector from data
+#' Sample correlations of the regressor, outcome and instrument
+#'
+#' Computes \eqn{\hat\rho = (\hat\rho_{xy}, \hat\rho_{xz}, \hat\rho_{yz})'} on
+#' the rows with no missing value in the three columns. At least five such
+#' rows are required.
+#'
 #' @param data Data frame.
-#' @param x_col Name of x column.
-#' @param y_col Name of y column.
-#' @param z_col Name of z column.
-#' @return Named numeric vector of correlations.
+#' @param x_col,y_col,z_col Names of the regressor, outcome and instrument
+#'   columns.
+#' @return Named numeric vector \code{c(rho_xy, rho_xz, rho_yz)}.
 #' @export
+#' @examples
+#' set.seed(1)
+#' x <- rnorm(100)
+#' d <- data.frame(x = x, y = x + rnorm(100), z = 0.5 * x + rnorm(100))
+#' estimate_rho(d)
 
 estimate_rho <- function(data, x_col = "x", y_col = "y", z_col = "z") {
   # Validate column presence

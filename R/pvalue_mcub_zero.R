@@ -32,6 +32,22 @@
 #'   \code{label}, and the admissible range used.
 #' @export
 #' @importFrom stats qnorm
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' rho <- c(cor(x, y), cor(x, z), cor(y, z))
+#' Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+#' A <- cr_Amat(seq(0, 0.8, length.out = 10))
+#'
+#' # A five-point grid, three refinement steps and few draws keep the example
+#' # fast; use the defaults in applied work.
+#' pv <- pvalue_mcub_zero(cr_delta(rho), Omega, A, A, cr_grid_map(A),
+#'                        B = 50, Blarge = 500, tol = 0.01,
+#'                        alpha_grid = c(0.02, 0.05, 0.1, 0.2, 0.4),
+#'                        refine_steps = 3)
+#' pv$label
 
 pvalue_mcub_zero <- function(deltahat, deltaSigma, Al, Au, g,
                              eta          = 0.001,
@@ -121,6 +137,19 @@ pvalue_mcub_zero <- function(deltahat, deltaSigma, Al, Au, g,
 #' @param B_fast,Blarge_fast Deprecated; use \code{B} and \code{Blarge}.
 #' @return Numeric scalar \code{p_adm}.
 #' @export
+#' @examples
+#' # Deprecated: call pvalue_mcub_zero() instead.
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' rho <- c(cor(x, y), cor(x, z), cor(y, z))
+#' Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+#' A <- cr_Amat(seq(0, 0.8, length.out = 10))
+#' suppressWarnings(
+#'   pvalue_mcub_zero_fast(cr_delta(rho), Omega, A, A, cr_grid_map(A),
+#'                         B_fast = 50, Blarge_fast = 500, tol = 0.01,
+#'                         alpha_grid = c(0.05, 0.2, 0.4), refine_steps = 2))
 pvalue_mcub_zero_fast <- function(deltahat, deltaSigma, Al, Au, g,
                                   eta = 0.001,
                                   B_fast = 300L, Blarge_fast = 3000L,

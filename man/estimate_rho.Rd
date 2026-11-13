@@ -2,22 +2,27 @@
 % Please edit documentation in R/estimate_rho.R
 \name{estimate_rho}
 \alias{estimate_rho}
-\title{Estimates rho vector from data}
+\title{Sample correlations of the regressor, outcome and instrument}
 \usage{
 estimate_rho(data, x_col = "x", y_col = "y", z_col = "z")
 }
 \arguments{
 \item{data}{Data frame.}
 
-\item{x_col}{Name of x column.}
-
-\item{y_col}{Name of y column.}
-
-\item{z_col}{Name of z column.}
+\item{x_col, y_col, z_col}{Names of the regressor, outcome and instrument
+columns.}
 }
 \value{
-Named numeric vector of correlations.
+Named numeric vector \code{c(rho_xy, rho_xz, rho_yz)}.
 }
 \description{
-Estimates rho vector from data
+Computes \eqn{\hat\rho = (\hat\rho_{xy}, \hat\rho_{xz}, \hat\rho_{yz})'} on
+the rows with no missing value in the three columns. At least five such
+rows are required.
+}
+\examples{
+set.seed(1)
+x <- rnorm(100)
+d <- data.frame(x = x, y = x + rnorm(100), z = 0.5 * x + rnorm(100))
+estimate_rho(d)
 }
