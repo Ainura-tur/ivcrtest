@@ -202,3 +202,8 @@ In R, `citation("ivcrtest")` returns this reference.
 ## License
 
 MIT. See `LICENSE`.
+
+`CIhybrid()`, `CIcon()`, `CIcon_TNbounds()` and `CIproj_p()` are adapted from
+Xinyue Bei's [UnionBounds](https://github.com/xinyuebei-econ/UnionBounds)
+package, which is also MIT-licensed, copyright 2024 Xinyue Bei.
+`inst/COPYRIGHTS` lists the adapted functions and reproduces her licence.

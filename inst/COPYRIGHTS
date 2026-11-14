@@ -18,14 +18,15 @@ bounds may be nonlinear in the estimated parameters. They also use
 stats::optim() in place of nloptr, take an explicit seed, and differ in
 their arguments and return values.
 
-UnionBounds is distributed under the MIT licence, which is reproduced
-below.
+UnionBounds is distributed under the MIT licence. Its LICENSE file is
+reproduced below as distributed.
 
 ------------------------------------------------------------------------
 
-MIT License
+# MIT License
 
-Copyright (c) 2024 Xinyue Bei
+YEAR: 2024
+COPYRIGHT HOLDER: Xinyue Bei
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
