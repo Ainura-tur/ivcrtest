@@ -1,4 +1,4 @@
-# ivcrtest (development version)
+# ivcrtest 0.2.2
 
 * `iv_cr_test()`, `estimate_cov_corr_boot()` and `im_stoye_inference()` now
   restore the session's random-number state when they exit, as `CIhybrid()`

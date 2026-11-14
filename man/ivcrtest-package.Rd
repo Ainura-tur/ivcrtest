@@ -25,11 +25,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu}
+\strong{Maintainer}: Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu} (\href{https://orcid.org/0000-0003-2428-2762}{ORCID})
 
 Authors:
 \itemize{
-  \item Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu}
+  \item Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu} (\href{https://orcid.org/0000-0003-2428-2762}{ORCID})
   \item Ainura Tursunalieva \email{ainura.tursunalieva@csiro.au} (\href{https://orcid.org/0000-0003-2784-9031}{ORCID})
 }
 

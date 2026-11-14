@@ -12,12 +12,13 @@ naive selected-endpoint intervals reported alongside as diagnostics.
 ## Install
 
 ```r
-remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git", ref = "v0.2.1")
+remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git", ref = "v0.2.2")
 library(ivcrtest)
 ```
 
-Version 0.2.1 is the current release. It corrects `cr_valid_range()`; see
-[NEWS.md](NEWS.md). With default settings, `iv_cr_test()` gives the same results
+Version 0.2.2 is the current release. It gives the same results as 0.2.1 and
+prepares the package for CRAN; see [NEWS.md](NEWS.md). Version 0.2.1 corrected
+`cr_valid_range()`. With default settings, `iv_cr_test()` gives the same results
 as version 0.2.0, the version used in the paper. To install that version
 exactly, use `ref = "v0.2.0"`. Imports `MASS` and `Matrix`. `wooldridge` is
 needed only for the examples below.
