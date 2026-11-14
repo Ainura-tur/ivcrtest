@@ -1,3 +1,20 @@
+# ivcrtest 0.2.2
+
+* `iv_cr_test()`, `estimate_cov_corr_boot()` and `im_stoye_inference()` now
+  restore the session's random-number state when they exit, as `CIhybrid()`
+  already did. Results are unchanged. With `seed = NULL`,
+  `estimate_cov_corr_boot()` now draws from the session's current stream
+  instead of reseeding at random.
+* Every exported function now has an example, and the help pages of the
+  lower-level functions describe what they compute. The `iv_cr_test()`
+  example no longer fails when wooldridge is not installed.
+* Xinyue Bei is now listed as a contributor and copyright holder, because
+  `CIhybrid()`, `CIcon()`, `CIcon_TNbounds()` and `CIproj_p()` are adapted
+  from her UnionBounds package. See `inst/COPYRIGHTS`.
+* The package now cites the published article, Dzhumashev and Tursunalieva
+  (2026, *Econometric Reviews*), and Bei (2024), each with its DOI.
+  `citation("ivcrtest")` returns the article.
+
 # ivcrtest 0.2.1
 
 * `cr_valid_range()` now returns the valid range of Section 3.5. Version

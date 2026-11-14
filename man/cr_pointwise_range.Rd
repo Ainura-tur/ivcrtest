@@ -59,3 +59,14 @@ lies close to the valid range, which is the more conservative of the two.
 At a single \eqn{t} the identified set is the point \eqn{g(\rho;t)}, so the
 relevant interval is the ordinary normal one and no union bound arises.
 }
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+df <- data.frame(x = x, y = y, z = z)
+
+pr <- cr_pointwise_range(df, rxu_range = c(0, 0.8), k = 1, B_boot = 200)
+pr$range
+pr$breakdown_range
+}

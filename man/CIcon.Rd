@@ -2,32 +2,67 @@
 % Please edit documentation in R/CIcon.R
 \name{CIcon}
 \alias{CIcon}
-\title{Returns final CI}
+\title{Conditional confidence interval for a union bound}
+\source{
+Adapted from \code{CIcon()} in the UnionBounds package by Xinyue
+  Bei, \url{https://github.com/xinyuebei-econ/UnionBounds}, MIT licence.
+  See the file \file{COPYRIGHTS} installed with ivcrtest.
+}
 \usage{
 CIcon(deltahat, deltaSigma, Al, Au, c_LF, alphac, tol, tol_r, g)
 }
 \arguments{
-\item{deltahat}{(B x k) matrix}
+\item{deltahat}{Numeric vector, the point estimate \eqn{\hat\delta}.}
 
-\item{deltaSigma}{(B x k) matrix}
+\item{deltaSigma}{Sampling covariance matrix of \code{deltahat}.}
 
-\item{Al}{constraint matrices}
+\item{Al, Au}{Matrices with one row per grid point that map \eqn{\delta} to
+the lower and upper bounds; equal in the degenerate-bound case.}
 
-\item{Au}{constraint matrices}
+\item{c_LF}{Critical value used to widen the plug-in bounds and to cap the
+truncation points; \code{\link{CIhybrid}} uses \code{qnorm(1 - eta)}.}
 
-\item{c_LF}{critical value}
+\item{alphac}{Level of the conditional test.}
 
-\item{alphac}{adjusted alpha level}
+\item{tol}{Step by which each endpoint moves inward.}
 
-\item{tol}{tolerance for correlation threshold}
+\item{tol_r}{Tolerance for the pairwise-correlation screen in
+\code{\link{CIcon_TNbounds}}.}
 
-\item{tol_r}{tolerance for correlation threshold}
-
-\item{g}{mapping function returning lambda estimates}
+\item{g}{Function mapping a matrix of \eqn{\delta} values, one per row, to
+the grid-level bounds, one column per grid point; for example
+\code{cr_grid_map(A)}.}
 }
 \value{
-Return final CI
+Numeric vector of length 2, the lower and upper limits of the
+  conditional interval.
 }
 \description{
-Returns final CI
+Computes the conditional confidence interval of Bei (2024) for a parameter
+whose identified set is the union bound \eqn{[\min_b \lambda_{l,b},
+\max_b \lambda_{u,b}]}. Each endpoint starts at the plug-in bound widened
+by \code{c_LF} standard errors and moves inward in steps of \code{tol}
+until the conditional test stops rejecting or the endpoint reaches the
+plug-in bound. The test uses the truncation points from
+\code{\link{CIcon_TNbounds}}. \code{\link{CIhybrid}} combines this interval
+with the calibrated projection interval.
+}
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Sigma_rho <- estimate_cov_corr_boot(x, y, z, B = 200)
+
+A <- cr_Amat(seq(0, 0.8, length.out = 20))
+CIcon(cr_delta(rho), cr_omega_delta(rho, Sigma_rho), A, A,
+      c_LF = qnorm(1 - 0.001), alphac = 0.04, tol = 0.001, tol_r = 0.001,
+      g = cr_grid_map(A))
+}
+\references{
+Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+  5023605. Version of October 6, 2025. Available at
+  \url{https://ssrn.com/abstract=5023605} or \doi{10.2139/ssrn.5023605}.
+  Implemented in the UnionBounds R package.
 }

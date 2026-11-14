@@ -49,7 +49,7 @@ inconsistent with the default positive \code{rxu_range}.}
 
 \item{seed}{Integer seed for the Monte Carlo draws of the MCUB interval and
 the p-value inversion. It does not set the bootstrap draws; see
-\code{boot_seed}.}
+\code{boot_seed}. The caller's random-number state is restored on exit.}
 
 \item{boot_seed}{Integer seed for the bootstraps of the covariance of rho_hat
 and of the IM/Stoye standard errors. Instrument \code{j} uses
@@ -102,15 +102,40 @@ its negative, which is without loss of generality under Lemma 2.3 since
 identified set and leaves the zero-inclusion decision unchanged.
 }
 \examples{
+# Simulated data: z is a valid instrument and corr(x, u) > 0, so k = +1.
+set.seed(1)
+n <- 500
+z <- rnorm(n); w <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + 0.3 * w + v
+y <- 1 + 0.5 * x + 0.2 * w + u
+dat <- data.frame(y = y, x = x, z = z, w = w)
+
+# A small grid and few draws keep the example fast. Use the defaults in
+# applied work.
+res <- iv_cr_test(dat, X = "x", Y = "y", H = "w", Z = "z", k = 1,
+                  rxu_range = c(0, 0.8), K = 20, B_boot = 200,
+                  compute_pvalue = FALSE, verbose = FALSE,
+                  B = 100, Blarge = 1000, B_im = 199)
+res
+
 \donttest{
-data <- wooldridge::card
-H <- c("exper", "expersq", "black", "south", "smsa", "smsa66",
-       "reg661", "reg662", "reg663", "reg664",
-       "reg665", "reg666", "reg667", "reg668")
 # Card (1993): ability bias implies corr(educ, u) > 0, hence k = +1.
-res <- iv_cr_test(data, X = "educ", Y = "lwage", H = H,
-                  Z = c("fatheduc", "motheduc", "nearc2", "nearc4"),
-                  k = 1, alpha = 0.05, rxu_range = c(0, 0.8))
-print(res)
+# One instrument and no p-value inversion; the README reproduces all
+# four instruments of the paper's Table 2.
+if (requireNamespace("wooldridge", quietly = TRUE)) {
+  card <- wooldridge::card
+  H <- c("exper", "expersq", "black", "south", "smsa", "smsa66",
+         paste0("reg66", 1:8))
+  res_card <- iv_cr_test(card, X = "educ", Y = "lwage", H = H,
+                         Z = "fatheduc", k = 1, rxu_range = c(0, 0.8),
+                         compute_pvalue = FALSE, verbose = FALSE)
+  res_card
 }
+}
+}
+\references{
+Dzhumashev, R. and A. Tursunalieva (2026). A test for
+  instrumental variable validity using a partially identified correlation
+  restriction. \emph{Econometric Reviews}.
+  \doi{10.1080/07474938.2026.2741548}
 }

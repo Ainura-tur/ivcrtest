@@ -1,19 +1,26 @@
 Package: ivcrtest
 Type: Package
 Title: Correlation-Restriction Test for Instrument Validity
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
-    person("Ratbek", "Dzhumashev", email= "ratbek.dzhumashev@monash.edu", role = c("aut", "cre")),
-    person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@csiro.au", role = "aut"))
+    person("Ratbek", "Dzhumashev", email= "ratbek.dzhumashev@monash.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2428-2762")),
+    person("Ainura", "Tursunalieva", email = "ainura.tursunalieva@csiro.au", role = "aut",
+           comment = c(ORCID = "0000-0003-2784-9031")),
+    person("Xinyue", "Bei", role = c("ctb", "cph"),
+           comment = "Union-bound routines adapted from the UnionBounds package; see inst/COPYRIGHTS"))
 Description: Tests whether the orthogonality restriction on an instrument remains
     compatible with the data once the sign and magnitude of endogeneity are
     restricted. Inference uses the modified conditional union-bound interval of
-    Bei (2024), computed through the exact two-dimensional linear
-    reparameterisation of the finite-grid map, with Imbens-Manski/Stoye and
-    naive selected-endpoint intervals reported as diagnostics.
+    Bei (2024) <doi:10.2139/ssrn.5023605>, computed through the exact
+    two-dimensional linear reparameterisation of the finite-grid map, with
+    Imbens-Manski/Stoye and naive selected-endpoint intervals reported as
+    diagnostics. The test is described in Dzhumashev and Tursunalieva (2026)
+    <doi:10.1080/07474938.2026.2741548>.
 URL: https://github.com/Ainura-tur/ivcrtest
 BugReports: https://github.com/Ainura-tur/ivcrtest/issues
 License: MIT + file LICENSE
+Copyright: See file inst/COPYRIGHTS.
 Encoding: UTF-8
 Imports:
     stats,

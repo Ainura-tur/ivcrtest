@@ -2,7 +2,7 @@
 % Please edit documentation in R/im_stoye_inference.R
 \name{im_stoye_inference}
 \alias{im_stoye_inference}
-\title{Imbens-Manski/Stoye inference for identified set}
+\title{Imbens-Manski/Stoye interval for the identified set}
 \usage{
 im_stoye_inference(
   data,
@@ -21,35 +21,73 @@ im_stoye_inference(
 )
 }
 \arguments{
-\item{data}{Data frame.}
+\item{data}{Data frame containing the three variables.}
 
-\item{grid_r_xu}{Numeric vector of grid points.}
+\item{grid_r_xu}{Numeric vector of grid points for \eqn{\rho_{xu}}.}
 
-\item{g_fun}{Function mapping rho and r_xu to lambda.}
+\item{g_fun}{Function \code{g_fun(rho, r)} returning the grid map at the
+correlation vector \code{rho}, ordered (rho_xy, rho_xz, rho_yz), and the
+grid point or points \code{r}.}
 
 \item{alpha}{Numeric significance level.}
 
-\item{se_method}{Character, either "bootstrap" or "delta".}
+\item{se_method}{Either \code{"bootstrap"} or \code{"delta"}.}
 
 \item{B}{Integer number of bootstrap replications.}
 
-\item{grad_fun}{Optional gradient function for delta method.}
+\item{grad_fun}{Used when \code{se_method = "delta"}: a function
+\code{grad_fun(rho, r)} returning the gradient of the grid map with
+respect to \code{rho}.}
 
-\item{cov_rho}{Optional pre-computed covariance matrix.}
+\item{cov_rho}{Used when \code{se_method = "delta"}: an optional 3x3
+covariance of \eqn{\hat\rho} on the estimator scale. It is bootstrapped
+when NULL.}
 
-\item{seed}{Integer seed for reproducibility.}
+\item{seed}{Integer seed for the bootstrap draws, or NULL to use the
+current random-number stream. The caller's random-number state is
+restored on exit.}
 
-\item{x_col}{Name of x column.}
+\item{x_col, y_col, z_col}{Names of the regressor, outcome and instrument
+columns in \code{data}.}
 
-\item{y_col}{Name of y column.}
-
-\item{z_col}{Name of z column.}
-
-\item{return_boot}{Logical, whether to return bootstrap draws.}
+\item{return_boot}{Logical; whether to return the bootstrap endpoint draws.}
 }
 \value{
-List with CI_IM, reject_H0_0_in_C, and diagnostics.
+A list with the interval \code{CI_IM}; the logical
+  \code{reject_H0_0_in_C}, TRUE when zero lies outside the interval; the
+  plug-in endpoints \code{theta_l_hat} and \code{theta_u_hat}; their
+  standard errors \code{se_l} and \code{se_u}; the critical value
+  \code{c_alpha}; and the inputs used.
 }
 \description{
-Imbens-Manski/Stoye inference for identified set
+Computes the Imbens and Manski (2004) and Stoye (2009) confidence interval
+for a parameter whose identified set is \eqn{[\theta_l, \theta_u]}, where
+\eqn{\theta_l} and \eqn{\theta_u} are the minimum and maximum of
+\code{g_fun(rho_hat, r)} over the grid. Endpoint standard errors come from
+the bootstrap or the delta method. The critical value solves
+\eqn{\Phi(c + \hat\Delta/\hat s) - \Phi(-c) = 1 - \alpha}, where
+\eqn{\hat\Delta} is the width of the estimated set and \eqn{\hat s} the
+larger endpoint standard error; see \code{\link{solve_c_im}}. The function
+also reports whether zero lies outside the interval.
+\code{\link{check_compatibility}} reports this interval as a diagnostic
+alongside the MCUB interval.
+}
+\examples{
+set.seed(1)
+n <- 300
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+df <- data.frame(x = x, y = y, z = z)
+g <- function(rho, r) as.numeric(cr_Amat(r) \%*\% cr_delta(rho))
+res <- im_stoye_inference(df, seq(0, 0.8, length.out = 20), g_fun = g,
+                          B = 199)
+res$CI_IM
+res$reject_H0_0_in_C
+}
+\references{
+Imbens, G. W. and C. F. Manski (2004). Confidence intervals for
+  partially identified parameters. \emph{Econometrica} 72(6), 1845--1857.
+
+  Stoye, J. (2009). More on confidence intervals for partially identified
+  parameters. \emph{Econometrica} 77(4), 1299--1315.
 }

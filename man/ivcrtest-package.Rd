@@ -10,6 +10,12 @@ Tests whether the orthogonality restriction on an instrument remains
 compatible with the data once the sign and magnitude of endogeneity are
 restricted.
 }
+\references{
+Dzhumashev, R. and A. Tursunalieva (2026). A test for
+  instrumental variable validity using a partially identified correlation
+  restriction. \emph{Econometric Reviews}.
+  \doi{10.1080/07474938.2026.2741548}
+}
 \seealso{
 Useful links:
 \itemize{
@@ -19,12 +25,17 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu}
+\strong{Maintainer}: Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu} (\href{https://orcid.org/0000-0003-2428-2762}{ORCID})
 
 Authors:
 \itemize{
-  \item Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu}
-  \item Ainura Tursunalieva \email{ainura.tursunalieva@csiro.au}
+  \item Ratbek Dzhumashev \email{ratbek.dzhumashev@monash.edu} (\href{https://orcid.org/0000-0003-2428-2762}{ORCID})
+  \item Ainura Tursunalieva \email{ainura.tursunalieva@csiro.au} (\href{https://orcid.org/0000-0003-2784-9031}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Xinyue Bei (Union-bound routines adapted from the UnionBounds package; see inst/COPYRIGHTS) [contributor, copyright holder]
 }
 
 }

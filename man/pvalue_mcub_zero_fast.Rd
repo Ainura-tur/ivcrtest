@@ -47,3 +47,17 @@ inversion and searched a grid extending outside the theorem-backed range
 (0.01, 0.5) without censoring. This alias forwards to
 \code{\link{pvalue_mcub_zero}} and returns the scalar \code{p_adm}.
 }
+\examples{
+# Deprecated: call pvalue_mcub_zero() instead.
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+A <- cr_Amat(seq(0, 0.8, length.out = 10))
+suppressWarnings(
+  pvalue_mcub_zero_fast(cr_delta(rho), Omega, A, A, cr_grid_map(A),
+                        B_fast = 50, Blarge_fast = 500, tol = 0.01,
+                        alpha_grid = c(0.05, 0.2, 0.4), refine_steps = 2))
+}

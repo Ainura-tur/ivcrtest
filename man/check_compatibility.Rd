@@ -97,3 +97,25 @@ quantity.
 All covariance quantities are on the estimator scale, \eqn{\hat\Sigma_{\rho,n}
 = \widehat{Var}(\hat\rho)}, so no further division by n is applied anywhere.
 }
+\examples{
+# Simulated data, already free of controls: z is a valid instrument and
+# corr(x, u) > 0.
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+df <- data.frame(x = x, y = y, z = z)
+
+# A small grid and few draws keep the example fast.
+res <- check_compatibility(df, k = 1, rxu_range = c(0, 0.8), K = 20,
+                           B_boot = 200, B = 100, Blarge = 1000,
+                           B_im = 199, compute_pvalue = FALSE,
+                           verbose = FALSE)
+res[, c("plug_in", "CI_MCUB", "CI_IM", "CI_naive", "zero_in_mcub")]
+}
+\references{
+Dzhumashev, R. and A. Tursunalieva (2026). A test for
+  instrumental variable validity using a partially identified correlation
+  restriction. \emph{Econometric Reviews}.
+  \doi{10.1080/07474938.2026.2741548}
+}

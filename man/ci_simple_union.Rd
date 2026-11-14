@@ -55,3 +55,9 @@ The former \code{ci_simple_union} applied a union-bound critical value
 (22). This alias forwards to \code{\link{ci_naive_endpoint}} and therefore
 returns a different, narrower interval than the old function did.
 }
+\examples{
+# Deprecated: call ci_naive_endpoint() instead.
+set.seed(1)
+x <- rnorm(200); y <- x + rnorm(200); z <- 0.5 * x + rnorm(200)
+suppressWarnings(ci_simple_union(x, y, z, B_boot = 100))$CI
+}

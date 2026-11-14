@@ -57,3 +57,12 @@ Grid-level standard errors are computed from the exact representation
 \eqn{\hat\Sigma_\lambda = A\hat\Omega_\delta A'}. By equation (12) these are
 numerically identical to the delta-method expression in \eqn{\rho}.
 }
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+res <- ci_naive_endpoint(x, y, z, rxu_range = c(0, 0.8), K = 80,
+                         B_boot = 200)
+res$CI
+}

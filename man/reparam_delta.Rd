@@ -55,3 +55,19 @@ rows \eqn{(r_b, -\sqrt{1 - r_b^2})}; \code{cr_omega_delta} forms
 linear map \eqn{\delta \mapsto A\delta} in the interface expected by
 \code{CIhybrid}.
 }
+\examples{
+rho <- c(rho_xy = 0.5, rho_xz = 0.4, rho_yz = 0.3)
+r <- seq(0, 0.8, length.out = 5)
+A <- cr_Amat(r)
+delta <- cr_delta(rho)
+
+# Lemma 3.1: the grid map is exactly linear in delta.
+all.equal(as.numeric(A \%*\% delta), as.numeric(g_xu_safe(r, rho)))
+
+cr_h(rho)
+cr_jacobian(rho)
+Sigma_rho <- matrix(c(4, 1, 1, 1, 9, 2, 1, 2, 6), 3, 3) / 1e4
+cr_omega_delta(rho, Sigma_rho)
+g <- cr_grid_map(A)
+g(delta)
+}

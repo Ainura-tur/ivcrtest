@@ -2,20 +2,29 @@
 % Please edit documentation in R/g_xu_safe.R
 \name{g_xu_safe}
 \alias{g_xu_safe}
-\title{Computes the CIs and probabilities}
+\title{Grid map on a grid of endogeneity values, with clamping}
 \usage{
 g_xu_safe(r_xu, delta, tol = 1e-10)
 }
 \arguments{
-\item{r_xu}{Numeric scalar, value of correlation coefficient rho_xu.}
+\item{r_xu}{Numeric vector of grid points for \eqn{\rho_{xu}}.}
 
-\item{delta}{Numeric vector for observed correlations coefficient: r_xy, r_xz, r_yz.}
+\item{delta}{Correlations ordered (rho_xy, rho_xz, rho_yz): a vector of
+length 3, or a matrix with one such row per draw.}
 
-\item{tol}{tolerance level}
+\item{tol}{Clamping tolerance.}
 }
 \value{
-values of function g(rho, r_xu).
+A matrix with one row per row of \code{delta} and one column per
+  grid point. Non-finite values are returned as NA.
 }
 \description{
-Computes the CIs and probabilities
+Vectorised version of \code{\link{g_fun}}. Evaluates \eqn{g(\rho; r)} for
+every row of \code{delta} and every value in \code{r_xu}, clamping
+\eqn{\rho_{xy}} and \eqn{r} inside \eqn{(-1, 1)}. Under the primitive
+route, \code{\link{check_compatibility}} passes it to \code{\link{CIhybrid}}
+as the map \code{g}.
+}
+\examples{
+g_xu_safe(seq(0, 0.8, by = 0.2), c(0.5, 0.4, 0.3))
 }

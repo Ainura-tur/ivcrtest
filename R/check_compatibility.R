@@ -50,8 +50,27 @@
 #'   \code{Zero_in_CI_IM} and \code{Zero_in_naive} hold a check mark or a cross
 #'   for display; \code{zero_in_mcub}, \code{zero_in_im} and
 #'   \code{zero_in_naive} hold the same results as logicals, for computation.
+#' @references Dzhumashev, R. and A. Tursunalieva (2026). A test for
+#'   instrumental variable validity using a partially identified correlation
+#'   restriction. \emph{Econometric Reviews}.
+#'   \doi{10.1080/07474938.2026.2741548}
 #' @export
 #' @importFrom stats complete.cases cor qnorm
+#' @examples
+#' # Simulated data, already free of controls: z is a valid instrument and
+#' # corr(x, u) > 0.
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' df <- data.frame(x = x, y = y, z = z)
+#'
+#' # A small grid and few draws keep the example fast.
+#' res <- check_compatibility(df, k = 1, rxu_range = c(0, 0.8), K = 20,
+#'                            B_boot = 200, B = 100, Blarge = 1000,
+#'                            B_im = 199, compute_pvalue = FALSE,
+#'                            verbose = FALSE)
+#' res[, c("plug_in", "CI_MCUB", "CI_IM", "CI_naive", "zero_in_mcub")]
 
 check_compatibility <- function(df, i = 1L, n = NULL, k = 1,
                                 alpha          = 0.05,

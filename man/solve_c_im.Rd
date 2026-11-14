@@ -2,18 +2,33 @@
 % Please edit documentation in R/solve_c_im.R
 \name{solve_c_im}
 \alias{solve_c_im}
-\title{Solves for Imbens-Manski critical value}
+\title{Imbens-Manski critical value}
 \usage{
 solve_c_im(alpha, t)
 }
 \arguments{
 \item{alpha}{Numeric significance level.}
 
-\item{t}{Numeric ratio of identified set width to max SE.}
+\item{t}{Non-negative numeric scalar: the set width divided by the larger
+endpoint standard error.}
 }
 \value{
-Numeric critical value.
+Numeric scalar, the critical value.
 }
 \description{
-Solves for Imbens-Manski critical value
+Solves \eqn{\Phi(c + t) - \Phi(-c) = 1 - \alpha} for \eqn{c \ge 0}, where
+\eqn{t} is the width of the estimated identified set divided by the larger
+endpoint standard error. With \eqn{t = 0} the solution is
+\eqn{z_{1-\alpha/2}}; as \eqn{t} grows it falls towards
+\eqn{z_{1-\alpha}}. \code{\link{im_stoye_inference}} uses it to form the
+Imbens-Manski/Stoye interval.
+}
+\examples{
+solve_c_im(0.05, 0)    # equals qnorm(0.975)
+solve_c_im(0.05, 2)
+solve_c_im(0.05, 10)   # close to qnorm(0.95)
+}
+\references{
+Imbens, G. W. and C. F. Manski (2004). Confidence intervals for
+  partially identified parameters. \emph{Econometrica} 72(6), 1845--1857.
 }

@@ -2,22 +2,27 @@
 % Please edit documentation in R/g_fun.R
 \name{g_fun}
 \alias{g_fun}
-\title{Return value of r_zu}
+\title{Grid map from the assumed endogeneity correlation to rho_zu}
 \usage{
 g_fun(r, rho_xy, rho_xz, rho_yz)
 }
 \arguments{
-\item{r}{r_xu values}
+\item{r}{Numeric vector of assumed values of \eqn{\rho_{xu}}.}
 
-\item{rho_xy}{observed correlation values}
-
-\item{rho_xz}{observed correlation values}
-
-\item{rho_yz}{observed correlation values}
+\item{rho_xy, rho_xz, rho_yz}{Observed correlations.}
 }
 \value{
-Return value of r_zu
+Numeric vector of implied \eqn{\rho_{zu}} values, one per element
+  of \code{r}.
 }
 \description{
-Return value of r_zu
+Evaluates \eqn{g(\rho; r) = \rho_{xz} r - (\rho_{xy}\rho_{xz} - \rho_{yz})
+\sqrt{(1 - r^2)/(1 - \rho_{xy}^2)}}, the value of \eqn{\rho_{zu}} implied
+by the observed correlations when \eqn{\rho_{xu} = r}. The identified set
+for \eqn{\rho_{zu}} is the range of this map over the domain D.
+\code{\link{g_xu_safe}} is a vectorised version that clamps its inputs.
+}
+\examples{
+r <- seq(0, 0.8, by = 0.2)
+g_fun(r, rho_xy = 0.5, rho_xz = 0.4, rho_yz = 0.3)
 }

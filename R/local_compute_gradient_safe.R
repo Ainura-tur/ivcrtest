@@ -1,22 +1,22 @@
 
-#' Computes gradient of g_xu(r_xu, rho_xy, rho_xz, rho_yz)
-#
-# with NA/Inf safety.
-#
-# Arguments:
-#   r_xu, rho_xy, rho_xz, rho_yz : numeric scalars or vectors
-#   tol : tolerance for numerical stability
-#
-# Returns:
-#   grad : 3 x length(r_xu) matrix (each column is a gradient vector)
-# ---------------------------------------------------------
-#' @param rho_xy observed correlation values.
-#' @param rho_xz observed correlation values.
-#' @param rho_yz observed correlation values.
-#' @param r_xu assumed correlation  values.
-#' @param tol  Numeric scalar for error tolerance.
-#' @return 3 x length(r_xu) matrix (each column is a gradient vector).
+#' Gradient of the grid map on a grid, with clamping
+#'
+#' Vectorised version of \code{\link{g_grad}}. Returns the gradient of
+#' \eqn{g(\rho; r)} with respect to (rho_xy, rho_xz, rho_yz) at each value in
+#' \code{r_xu}, clamping \eqn{\rho_{xy}} and \eqn{r} inside \eqn{(-1, 1)}.
+#' Under the primitive route, \code{\link{check_compatibility}} uses these
+#' gradients as the constraint matrices passed to \code{\link{CIhybrid}}.
+#'
+#' @param r_xu Numeric vector of grid points for \eqn{\rho_{xu}}.
+#' @param rho_xy,rho_xz,rho_yz Observed correlations.
+#' @param tol Clamping tolerance.
+#' @return A matrix with three rows, the derivatives with respect to rho_xy,
+#'   rho_xz and rho_yz, and one column per grid point. Non-finite values are
+#'   returned as NA.
 #' @export
+#' @examples
+#' local_compute_gradient_safe(c(0, 0.4, 0.8), rho_xy = 0.5, rho_xz = 0.4,
+#'                             rho_yz = 0.3)
 
 local_compute_gradient_safe <- function(r_xu, rho_xy, rho_xz, rho_yz, tol = 1e-10) {
 

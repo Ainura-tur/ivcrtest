@@ -64,3 +64,20 @@ The admissible range follows from the tuning conditions of Proposition 3.2:
 \eqn{\alpha < 1/2} and \eqn{\eta < (\alpha - \alpha_c)/2 = \alpha/10}, so
 with \eqn{\eta = 0.001} the lower boundary is \eqn{\alpha = 0.01}.
 }
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+A <- cr_Amat(seq(0, 0.8, length.out = 10))
+
+# A five-point grid, three refinement steps and few draws keep the example
+# fast; use the defaults in applied work.
+pv <- pvalue_mcub_zero(cr_delta(rho), Omega, A, A, cr_grid_map(A),
+                       B = 50, Blarge = 500, tol = 0.01,
+                       alpha_grid = c(0.02, 0.05, 0.1, 0.2, 0.4),
+                       refine_steps = 3)
+pv$label
+}

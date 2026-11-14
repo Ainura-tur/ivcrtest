@@ -82,3 +82,16 @@ switching point the more conservative of the two.
 \eqn{\hat\Omega_\delta} does not depend on the domain, so the bootstrap runs
 once and every bisection step reuses it.
 }
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+df <- data.frame(x = x, y = y, z = z)
+
+# A coarse scan, two bisection steps, a small grid and few draws keep the
+# example fast; use the defaults in applied work.
+cr_switch_point(df, rho_bar = 0.8, k = 1, direction = "below",
+                scan_grid = c(0.2, 0.4, 0.6), steps = 2, K = 10,
+                B_boot = 200, B = 50, Blarge = 500, tol = 0.01)
+}

@@ -1,20 +1,64 @@
+# Adapted from CIcon_TNbounds() in the UnionBounds package by Xinyue Bei
+# (https://github.com/xinyuebei-econ/UnionBounds), MIT licence,
+# Copyright (c) 2024 Xinyue Bei. See inst/COPYRIGHTS.
 
-#' Computes list(th_1, th_2): lower / upper bounds vectors
-#' @param theta scalar
-#' @param deltahat (B x k) matrix
-#' @param Al constraint matrice
-#' @param Au constraint matrices
-#' @param sigma_l standard deviations of lambda_hat_l / u
-#' @param sigma_u standard deviations of lambda_hat_l / u
-#' @param corr_m correlation blocks
-#' @param corr_l correlation blocks
-#' @param corr_u correlation blocks
-#' @param cLFl critical values
-#' @param cLFu critical values
-#' @param tol_r tolerance for correlation threshold
-#' @param g mapping function returning lambda estimates
-#' @return list(th_1, th_2): lower / upper bounds vectors
+#' Truncation points for the conditional test
+#'
+#' For a hypothesised value \code{theta} and each row of \code{deltahat},
+#' computes the truncation points \eqn{\theta_1} and \eqn{\theta_2} of the
+#' truncated-normal distribution used by the conditional test of Bei (2024).
+#' The test statistic is the larger of the smallest standardised distances
+#' from \code{theta} to the lower and upper grid-level bounds, and the
+#' truncation conditions on the grid points that attain those minima. Pairs
+#' of grid points whose correlation lies within \code{tol_r} of -1 or 1 are
+#' screened out; \code{\link{cr_corr_screen}} reports how many pairs this
+#' removes.
+#'
+#' @param theta Numeric scalar, the hypothesised value of the parameter.
+#' @param deltahat Matrix of \eqn{\delta} values, one per row: a single row
+#'   for the point estimate, or one row per simulated draw.
+#' @param Al,Au Matrices with one row per grid point that map \eqn{\delta} to
+#'   the lower and upper bounds.
+#' @param sigma_l,sigma_u Standard deviations of the lower and upper
+#'   grid-level bounds.
+#' @param corr_m Correlation matrix between the lower bounds (rows) and the
+#'   upper bounds (columns).
+#' @param corr_l,corr_u Correlation matrices of the lower bounds and of the
+#'   upper bounds.
+#' @param cLFl,cLFu Caps on the upper truncation point when the lower or the
+#'   upper side binds; \code{\link{CIcon}} uses \code{qnorm(1 - eta)} for both.
+#' @param tol_r Tolerance for the pairwise-correlation screen.
+#' @param g Function mapping a matrix of \eqn{\delta} values, one per row, to
+#'   the grid-level bounds, one column per grid point; for example
+#'   \code{cr_grid_map(A)}.
+#' @return A list with \code{th_1} and \code{th_2}, the lower and upper
+#'   truncation points, each with one element per row of \code{deltahat}.
+#' @source Adapted from \code{CIcon_TNbounds()} in the UnionBounds package by
+#'   Xinyue Bei, \url{https://github.com/xinyuebei-econ/UnionBounds}, MIT
+#'   licence. See the file \file{COPYRIGHTS} installed with ivcrtest.
+#' @references Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+#'   5023605. Version of October 6, 2025. Available at
+#'   \url{https://ssrn.com/abstract=5023605} or \doi{10.2139/ssrn.5023605}.
+#'   Implemented in the UnionBounds R package.
 #' @export
+#' @examples
+#' set.seed(1)
+#' n <- 500
+#' z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+#' x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+#' rho <- c(cor(x, y), cor(x, z), cor(y, z))
+#' Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+#'
+#' # With Al = Au = A, every correlation block is the same matrix.
+#' A <- cr_Amat(seq(0, 0.8, length.out = 20))
+#' V <- A %*% Omega %*% t(A)
+#' s <- sqrt(diag(V))
+#' C <- V / outer(s, s)
+#' CIcon_TNbounds(theta = 0, deltahat = matrix(cr_delta(rho), nrow = 1),
+#'                Al = A, Au = A, sigma_l = s, sigma_u = s,
+#'                corr_m = C, corr_l = C, corr_u = C,
+#'                cLFl = qnorm(0.999), cLFu = qnorm(0.999), tol_r = 0.001,
+#'                g = cr_grid_map(A))
 CIcon_TNbounds <- function(theta, deltahat,
                            Al, Au,
                            sigma_l, sigma_u,

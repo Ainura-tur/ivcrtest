@@ -12,12 +12,13 @@ naive selected-endpoint intervals reported alongside as diagnostics.
 ## Install
 
 ```r
-remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git", ref = "v0.2.1")
+remotes::install_git("https://github.com/Ainura-tur/ivcrtest.git", ref = "v0.2.2")
 library(ivcrtest)
 ```
 
-Version 0.2.1 is the current release. It corrects `cr_valid_range()`; see
-[NEWS.md](NEWS.md). With default settings, `iv_cr_test()` gives the same results
+Version 0.2.2 is the current release. It gives the same results as 0.2.1 and
+prepares the package for CRAN; see [NEWS.md](NEWS.md). Version 0.2.1 corrected
+`cr_valid_range()`. With default settings, `iv_cr_test()` gives the same results
 as version 0.2.0, the version used in the paper. To install that version
 exactly, use `ref = "v0.2.0"`. Imports `MASS` and `Matrix`. `wooldridge` is
 needed only for the examples below.
@@ -148,7 +149,7 @@ differ by $o_p(1)$ and give identical grid-level standard errors.
 ## Relation to the paper
 
 The Quick start output reproduces the plug-in, MCUB and IM/Stoye columns of
-Table 2 in Dzhumashev and Tursunalieva (*Econometric Reviews*, forthcoming),
+Table 2 in Dzhumashev and Tursunalieva (2026, *Econometric Reviews*),
 and the one-call-per-instrument p-values above reproduce its p-value row. The
 naive column can differ in the third decimal, because the paper's replication
 scripts estimate that interval's covariance from a separate bootstrap draw. The
@@ -170,7 +171,9 @@ characterises the range of exogeneity over which validity survives.
 ## References
 
 Bei, X. (2024). Inference on union bounds. SSRN Working Paper 5023605.
-https://doi.org/10.2139/ssrn.5023605
+Version of October 6, 2025. Available at https://ssrn.com/abstract=5023605 or
+doi: [10.2139/ssrn.5023605](https://doi.org/10.2139/ssrn.5023605). Implemented
+in the [UnionBounds](https://github.com/xinyuebei-econ/UnionBounds) R package.
 
 Card, D. (1993). Using geographic variation in college proximity to estimate
 the return to schooling. NBER Working Paper 4483.
@@ -190,10 +193,18 @@ parameters. *Econometrica* 77(4), 1299–1315.
 
 ## Citation
 
-Dzhumashev, R. and A. Tursunalieva. A test for instrumental variable validity
-using a partially identified correlation restriction. *Econometric Reviews*,
-forthcoming.
+Dzhumashev, R. and A. Tursunalieva (2026). A test for instrumental variable
+validity using a partially identified correlation restriction. *Econometric
+Reviews*. Published online 23 October 2026.
+https://doi.org/10.1080/07474938.2026.2741548
+
+In R, `citation("ivcrtest")` returns this reference.
 
 ## License
 
 MIT. See `LICENSE`.
+
+`CIhybrid()`, `CIcon()`, `CIcon_TNbounds()` and `CIproj_p()` are adapted from
+Xinyue Bei's [UnionBounds](https://github.com/xinyuebei-econ/UnionBounds)
+package, which is also MIT-licensed, copyright 2024 Xinyue Bei.
+`inst/COPYRIGHTS` lists the adapted functions and reproduces her licence.

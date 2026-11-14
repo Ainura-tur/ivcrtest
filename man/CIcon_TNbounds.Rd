@@ -2,7 +2,12 @@
 % Please edit documentation in R/CIcon_TNbounds.R
 \name{CIcon_TNbounds}
 \alias{CIcon_TNbounds}
-\title{Computes list(th_1, th_2): lower / upper bounds vectors}
+\title{Truncation points for the conditional test}
+\source{
+Adapted from \code{CIcon_TNbounds()} in the UnionBounds package by
+  Xinyue Bei, \url{https://github.com/xinyuebei-econ/UnionBounds}, MIT
+  licence. See the file \file{COPYRIGHTS} installed with ivcrtest.
+}
 \usage{
 CIcon_TNbounds(
   theta,
@@ -21,35 +26,69 @@ CIcon_TNbounds(
 )
 }
 \arguments{
-\item{theta}{scalar}
+\item{theta}{Numeric scalar, the hypothesised value of the parameter.}
 
-\item{deltahat}{(B x k) matrix}
+\item{deltahat}{Matrix of \eqn{\delta} values, one per row: a single row
+for the point estimate, or one row per simulated draw.}
 
-\item{Al}{constraint matrice}
+\item{Al, Au}{Matrices with one row per grid point that map \eqn{\delta} to
+the lower and upper bounds.}
 
-\item{Au}{constraint matrices}
+\item{sigma_l, sigma_u}{Standard deviations of the lower and upper
+grid-level bounds.}
 
-\item{sigma_l}{standard deviations of lambda_hat_l / u}
+\item{corr_m}{Correlation matrix between the lower bounds (rows) and the
+upper bounds (columns).}
 
-\item{sigma_u}{standard deviations of lambda_hat_l / u}
+\item{corr_l, corr_u}{Correlation matrices of the lower bounds and of the
+upper bounds.}
 
-\item{corr_m}{correlation blocks}
+\item{cLFl, cLFu}{Caps on the upper truncation point when the lower or the
+upper side binds; \code{\link{CIcon}} uses \code{qnorm(1 - eta)} for both.}
 
-\item{corr_l}{correlation blocks}
+\item{tol_r}{Tolerance for the pairwise-correlation screen.}
 
-\item{corr_u}{correlation blocks}
-
-\item{cLFl}{critical values}
-
-\item{cLFu}{critical values}
-
-\item{tol_r}{tolerance for correlation threshold}
-
-\item{g}{mapping function returning lambda estimates}
+\item{g}{Function mapping a matrix of \eqn{\delta} values, one per row, to
+the grid-level bounds, one column per grid point; for example
+\code{cr_grid_map(A)}.}
 }
 \value{
-list(th_1, th_2): lower / upper bounds vectors
+A list with \code{th_1} and \code{th_2}, the lower and upper
+  truncation points, each with one element per row of \code{deltahat}.
 }
 \description{
-Computes list(th_1, th_2): lower / upper bounds vectors
+For a hypothesised value \code{theta} and each row of \code{deltahat},
+computes the truncation points \eqn{\theta_1} and \eqn{\theta_2} of the
+truncated-normal distribution used by the conditional test of Bei (2024).
+The test statistic is the larger of the smallest standardised distances
+from \code{theta} to the lower and upper grid-level bounds, and the
+truncation conditions on the grid points that attain those minima. Pairs
+of grid points whose correlation lies within \code{tol_r} of -1 or 1 are
+screened out; \code{\link{cr_corr_screen}} reports how many pairs this
+removes.
+}
+\examples{
+set.seed(1)
+n <- 500
+z <- rnorm(n); v <- rnorm(n); u <- 0.5 * v + rnorm(n)
+x <- 0.6 * z + v; y <- 1 + 0.5 * x + u
+rho <- c(cor(x, y), cor(x, z), cor(y, z))
+Omega <- cr_omega_delta(rho, estimate_cov_corr_boot(x, y, z, B = 200))
+
+# With Al = Au = A, every correlation block is the same matrix.
+A <- cr_Amat(seq(0, 0.8, length.out = 20))
+V <- A \%*\% Omega \%*\% t(A)
+s <- sqrt(diag(V))
+C <- V / outer(s, s)
+CIcon_TNbounds(theta = 0, deltahat = matrix(cr_delta(rho), nrow = 1),
+               Al = A, Au = A, sigma_l = s, sigma_u = s,
+               corr_m = C, corr_l = C, corr_u = C,
+               cLFl = qnorm(0.999), cLFu = qnorm(0.999), tol_r = 0.001,
+               g = cr_grid_map(A))
+}
+\references{
+Bei, X. (2024). Inference on union bounds. SSRN Working Paper
+  5023605. Version of October 6, 2025. Available at
+  \url{https://ssrn.com/abstract=5023605} or \doi{10.2139/ssrn.5023605}.
+  Implemented in the UnionBounds R package.
 }

@@ -2,22 +2,25 @@
 % Please edit documentation in R/g_grad.R
 \name{g_grad}
 \alias{g_grad}
-\title{Return value of gradient of g function}
+\title{Gradient of the grid map with respect to the observed correlations}
 \usage{
 g_grad(r, rho_xy, rho_xz, rho_yz)
 }
 \arguments{
-\item{r}{r_xu values}
+\item{r}{Numeric scalar, the assumed value of \eqn{\rho_{xu}}.}
 
-\item{rho_xy}{observed correlation values}
-
-\item{rho_xz}{observed correlation values}
-
-\item{rho_yz}{observed correlation values}
+\item{rho_xy, rho_xz, rho_yz}{Observed correlations.}
 }
 \value{
-Return value of gradient of g function
+Numeric vector of length 3: the derivatives with respect to
+  rho_xy, rho_xz and rho_yz.
 }
 \description{
-Return value of gradient of g function
+Returns the gradient of \code{\link{g_fun}} with respect to
+(rho_xy, rho_xz, rho_yz) at a single value of \eqn{\rho_{xu}}.
+\code{\link{local_compute_gradient_safe}} is a vectorised version that
+clamps its inputs.
+}
+\examples{
+g_grad(0.4, rho_xy = 0.5, rho_xz = 0.4, rho_yz = 0.3)
 }

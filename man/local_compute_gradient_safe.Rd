@@ -2,24 +2,30 @@
 % Please edit documentation in R/local_compute_gradient_safe.R
 \name{local_compute_gradient_safe}
 \alias{local_compute_gradient_safe}
-\title{Computes gradient of g_xu(r_xu, rho_xy, rho_xz, rho_yz)}
+\title{Gradient of the grid map on a grid, with clamping}
 \usage{
 local_compute_gradient_safe(r_xu, rho_xy, rho_xz, rho_yz, tol = 1e-10)
 }
 \arguments{
-\item{r_xu}{assumed correlation  values.}
+\item{r_xu}{Numeric vector of grid points for \eqn{\rho_{xu}}.}
 
-\item{rho_xy}{observed correlation values.}
+\item{rho_xy, rho_xz, rho_yz}{Observed correlations.}
 
-\item{rho_xz}{observed correlation values.}
-
-\item{rho_yz}{observed correlation values.}
-
-\item{tol}{Numeric scalar for error tolerance.}
+\item{tol}{Clamping tolerance.}
 }
 \value{
-3 x length(r_xu) matrix (each column is a gradient vector).
+A matrix with three rows, the derivatives with respect to rho_xy,
+  rho_xz and rho_yz, and one column per grid point. Non-finite values are
+  returned as NA.
 }
 \description{
-Computes gradient of g_xu(r_xu, rho_xy, rho_xz, rho_yz)
+Vectorised version of \code{\link{g_grad}}. Returns the gradient of
+\eqn{g(\rho; r)} with respect to (rho_xy, rho_xz, rho_yz) at each value in
+\code{r_xu}, clamping \eqn{\rho_{xy}} and \eqn{r} inside \eqn{(-1, 1)}.
+Under the primitive route, \code{\link{check_compatibility}} uses these
+gradients as the constraint matrices passed to \code{\link{CIhybrid}}.
+}
+\examples{
+local_compute_gradient_safe(c(0, 0.4, 0.8), rho_xy = 0.5, rho_xz = 0.4,
+                            rho_yz = 0.3)
 }
