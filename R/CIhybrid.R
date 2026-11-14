@@ -38,7 +38,9 @@
 #'   package by Xinyue Bei, \url{https://github.com/xinyuebei-econ/UnionBounds},
 #'   MIT licence. See the file \file{COPYRIGHTS} installed with ivcrtest.
 #' @references Bei, X. (2024). Inference on union bounds. SSRN Working Paper
-#'   5023605. \doi{10.2139/ssrn.5023605}
+#'   5023605. Version of October 6, 2025. Available at
+#'   \url{https://ssrn.com/abstract=5023605} or \doi{10.2139/ssrn.5023605}.
+#'   Implemented in the UnionBounds R package.
 #' @seealso \code{\link{check_compatibility}}, which calls this routine with
 #'   the settings used in the paper.
 #' @export

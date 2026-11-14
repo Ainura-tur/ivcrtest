@@ -1,0 +1,18 @@
+bibentry(
+  bibtype = "Article",
+  header  = "To cite ivcrtest in publications, please cite the article:",
+  title   = paste("A test for instrumental variable validity using a",
+                  "partially identified correlation restriction"),
+  author  = c(person("Ratbek", "Dzhumashev"),
+              person("Ainura", "Tursunalieva")),
+  journal = "Econometric Reviews",
+  year    = "2026",
+  doi     = "10.1080/07474938.2026.2741548",
+  note    = "Published online 23 October 2026",
+  textVersion = paste(
+    "Dzhumashev, R. and A. Tursunalieva (2026).",
+    "A test for instrumental variable validity using a partially identified",
+    "correlation restriction. Econometric Reviews. Published online",
+    "23 October 2026. https://doi.org/10.1080/07474938.2026.2741548"
+  )
+)

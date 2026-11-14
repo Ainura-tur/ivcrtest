@@ -50,6 +50,10 @@
 #'   \code{Zero_in_CI_IM} and \code{Zero_in_naive} hold a check mark or a cross
 #'   for display; \code{zero_in_mcub}, \code{zero_in_im} and
 #'   \code{zero_in_naive} hold the same results as logicals, for computation.
+#' @references Dzhumashev, R. and A. Tursunalieva (2026). A test for
+#'   instrumental variable validity using a partially identified correlation
+#'   restriction. \emph{Econometric Reviews}.
+#'   \doi{10.1080/07474938.2026.2741548}
 #' @export
 #' @importFrom stats complete.cases cor qnorm
 #' @examples

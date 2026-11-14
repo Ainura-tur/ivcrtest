@@ -133,3 +133,9 @@ if (requireNamespace("wooldridge", quietly = TRUE)) {
 }
 }
 }
+\references{
+Dzhumashev, R. and A. Tursunalieva (2026). A test for
+  instrumental variable validity using a partially identified correlation
+  restriction. \emph{Econometric Reviews}.
+  \doi{10.1080/07474938.2026.2741548}
+}

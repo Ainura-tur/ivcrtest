@@ -11,7 +11,9 @@
 * Xinyue Bei is now listed as a contributor and copyright holder, because
   `CIhybrid()`, `CIcon()`, `CIcon_TNbounds()` and `CIproj_p()` are adapted
   from her UnionBounds package. See `inst/COPYRIGHTS`.
-* The package description cites Bei (2024) with its DOI.
+* The package now cites the published article, Dzhumashev and Tursunalieva
+  (2026, *Econometric Reviews*), and Bei (2024), each with its DOI.
+  `citation("ivcrtest")` returns the article.
 
 # ivcrtest 0.2.1
 

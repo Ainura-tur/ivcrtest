@@ -113,3 +113,9 @@ res <- check_compatibility(df, k = 1, rxu_range = c(0, 0.8), K = 20,
                            verbose = FALSE)
 res[, c("plug_in", "CI_MCUB", "CI_IM", "CI_naive", "zero_in_mcub")]
 }
+\references{
+Dzhumashev, R. and A. Tursunalieva (2026). A test for
+  instrumental variable validity using a partially identified correlation
+  restriction. \emph{Econometric Reviews}.
+  \doi{10.1080/07474938.2026.2741548}
+}
