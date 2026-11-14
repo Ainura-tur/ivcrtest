@@ -63,6 +63,6 @@ CIcon(cr_delta(rho), cr_omega_delta(rho, Sigma_rho), A, A,
 \references{
 Bei, X. (2024). Inference on union bounds. SSRN Working Paper
   5023605. Version of October 6, 2025. Available at
-  \url{https://ssrn.com/abstract=5023605} or \doi{10.2139/ssrn.5023605}.
+  https://ssrn.com/abstract=5023605 or \doi{10.2139/ssrn.5023605}.
   Implemented in the UnionBounds R package.
 }
