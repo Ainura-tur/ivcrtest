@@ -77,7 +77,7 @@ CIhybrid <- function(deltahat, deltaSigma, Al, Au,
   # ----- 1. Random draws and basic quantities -----
   k_dim <- length(deltahat)
   deltastar_demean_large <- MASS::mvrnorm(Blarge, mu = rep(0, k_dim), Sigma = deltaSigma)
-  deviation <- apply(abs(deltastar_demean_large / sqrt(diag(deltaSigma))), 1, max)
+  deviation <- apply(sweep(abs(deltastar_demean_large), 2, sqrt(diag(deltaSigma)), "/"), 1, max)
   c_bd <- quantile(deviation, 1 - eta)
 
   sigma_delta <- sqrt(diag(deltaSigma))

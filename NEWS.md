@@ -1,3 +1,17 @@
+# ivcrtest 0.2.3
+
+* `CIhybrid()` now computes the bound `c_bd` as the paper's Online Appendix
+  describes. It divides each column of the simulated draws by that column's
+  standard deviation, then takes the 1 - `eta` quantile of each draw's
+  largest absolute value. Earlier versions divided the draws by a vector
+  that R recycled down the rows, so many entries were scaled by another
+  column's standard deviation. The fix matches the standardisation that
+  `CIproj_p()` already uses when it checks draws against `c_bd`. `c_bd` sets
+  the optimiser's search box and the draws kept in the auxiliary set, so the
+  projection interval, and with it the MCUB interval, can move slightly. The
+  conditional interval does not use `c_bd` and is unchanged. In the paper's
+  applications, no test decision changes.
+
 # ivcrtest 0.2.2
 
 * `iv_cr_test()`, `estimate_cov_corr_boot()` and `im_stoye_inference()` now
